@@ -49,21 +49,45 @@ export function RightRail() {
           <span className="k">Hull</span>
           <span className="v">{ship.hull}/{ship.hullMax}</span>
         </div>
-        <div className="bar" aria-label={`Hull ${hullPct}%`}>
+        <div
+          className="bar"
+          role="progressbar"
+          aria-label="Hull"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={hullPct}
+          aria-valuetext={`${ship.hull} of ${ship.hullMax}`}
+        >
           <div style={{ width: `${hullPct}%` }} />
         </div>
         <div className="kv" style={{ marginTop: 6 }}>
           <span className="k">Fuel</span>
           <span className="v">{ship.fuel}/{ship.fuelMax}</span>
         </div>
-        <div className="bar" aria-label={`Fuel ${fuelPct}%`}>
+        <div
+          className="bar"
+          role="progressbar"
+          aria-label="Fuel"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={fuelPct}
+          aria-valuetext={`${ship.fuel} of ${ship.fuelMax}`}
+        >
           <div style={{ width: `${fuelPct}%` }} />
         </div>
         <div className="kv" style={{ marginTop: 6 }}>
           <span className="k">Cargo</span>
           <span className="v">{ship.cargo}/{ship.cargoMax}</span>
         </div>
-        <div className="bar" aria-label={`Cargo ${cargoPct}%`}>
+        <div
+          className="bar"
+          role="progressbar"
+          aria-label="Cargo"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={cargoPct}
+          aria-valuetext={`${ship.cargo} of ${ship.cargoMax}`}
+        >
           <div style={{ width: `${cargoPct}%` }} />
         </div>
       </div>
