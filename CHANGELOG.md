@@ -51,6 +51,13 @@ Categories (omit a category if it has no entries):
   forward automatically on load. Legacy saves written by v0.1.x are detected
   by the old key and migrated seamlessly — no save lost on upgrade. (#21)
 
+### Internal
+- Galaxy map renderer scaffold. Adds `GalaxyMap`, `SystemMap`, and
+  `MiniMap` SVG components plus a `flags.galaxyMap` feature flag in the
+  Zustand store. The Helm screen renders the new components only when
+  the flag is on; default is off, so existing behaviour is unchanged.
+  Full implementation lands across three sub-issues of #91. (Refs #91)
+
 ### Bug Fixes
 - Datapad redesign accessibility/layout fixes: corner-accent stripes now
   anchor to the `.app` shell (added `position: relative`) instead of
@@ -58,6 +65,13 @@ Categories (omit a category if it has no entries):
   renders a real heading element (default `<h2>`, optional `as="h3"`)
   so screen-reader heading navigation continues to land on each panel
   title. (#90)
+- Galaxy map scaffold now sizes correctly via shared `.galaxy-map` /
+  `.system-map` CSS rules (mirrors `.starmap`); previously the new SVGs
+  fell back to the 300x150 default. Markers in `GalaxyMap` and
+  `SystemMap` are keyboard-focusable with `role="button"`, descriptive
+  `aria-label`s, and Enter/Space activation; `role="img"` removed from
+  the interactive SVGs. `MiniMap` now exposes its name to assistive tech
+  via `<title>` + `aria-labelledby` on the `<svg>` itself. (Refs #91)
 - Replaced `Math.random()` bootstrap calls in `src/engine/rng.ts` and
   `src/engine/game.ts` with `crypto.getRandomValues()`, satisfying the
   determinism policy. The UI and engine no longer call `Math.random`

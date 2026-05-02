@@ -30,7 +30,16 @@ interface AppState {
   game: GameState | null;
   trip: PendingTrip | null;
   lastResolution: ChoiceResolution | null;
+  /**
+   * UI-only feature flags. Off by default. Persisted nowhere; flipped at
+   * runtime via dev tooling or the title screen during scaffold work.
+   */
+  flags: {
+    /** Render the new SVG GalaxyMap / SystemMap / MiniMap (parent #91). */
+    galaxyMap: boolean;
+  };
   setScreen(s: Screen): void;
+  setFlag(name: keyof AppState['flags'], value: boolean): void;
 
   // Lifecycle
   startNewGame(seed?: string, captainName?: string): void;
@@ -61,7 +70,12 @@ export const useGameStore = create<AppState>((set, get) => ({
   game: null,
   trip: null,
   lastResolution: null,
+  flags: {
+    galaxyMap: false,
+  },
   setScreen: (s) => set({ screen: s }),
+  setFlag: (name, value) =>
+    set((s) => ({ flags: { ...s.flags, [name]: value } })),
 
   startNewGame: (seed, captainName) => {
     const g = newGame({ seed, captainName });
