@@ -160,14 +160,15 @@ gh release create / edit / list
 
 ## The Team
 
-| Name  | Role                                      | Domain                                                                         |
-| ----- | ----------------------------------------- | ------------------------------------------------------------------------------ |
-| Sol   | Co-Creative Director, Lead Programmer     | Engine, UI, TypeScript, workflows, PRs, changelog, save system                 |
-| Jesse | Repository Manager, Community Coordinator | Issues, project board, wiki (operational), labels, milestones, release notes   |
-| Vex   | Content & Lore Architect                  | Authored game data, events, lore, wiki (lore pages), mod content               |
-| Rook  | QA & Release Engineer                     | Build verification, CI monitoring, bug reproduction, release artifacts         |
+| Name   | Role                                      | Domain                                                                         |
+| ------ | ----------------------------------------- | ------------------------------------------------------------------------------ |
+| Bridge | Crew Dispatcher                           | Routes all requests to the correct specialist automatically                    |
+| Sol    | Co-Creative Director, Lead Programmer     | Engine, UI, TypeScript, workflows, PRs, changelog, save system                 |
+| Jesse  | Repository Manager, Community Coordinator | Issues, project board, wiki (operational), labels, milestones, release notes   |
+| Vex    | Content & Lore Architect                  | Authored game data, events, lore, wiki (lore pages), mod content               |
+| Rook   | QA & Release Engineer                     | Build verification, CI monitoring, bug reproduction, release artifacts         |
 
-Human director: **Scott Venable** (Creative Director, final decision authority).
+Human director: **Scotty Venable** (Creative Director, final decision authority).
 
 Jesse coordinates the repository layer for all agents. When Sol, Vex, or Rook
 need an issue created or a board item updated, they invoke Jesse. Jesse does

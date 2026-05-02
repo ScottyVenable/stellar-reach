@@ -127,14 +127,15 @@ system types, specific consequences.
 
 ## The Team
 
-| Name  | Role                                      | Domain                                                                         |
-| ----- | ----------------------------------------- | ------------------------------------------------------------------------------ |
-| Sol   | Co-Creative Director, Lead Programmer     | Engine, UI, TypeScript, workflows, PRs, changelog, save system                 |
-| Jesse | Repository Manager, Community Coordinator | Issues, project board, wiki (operational), labels, milestones, release notes   |
-| Vex   | Content & Lore Architect                  | Authored game data, events, lore, wiki (lore pages), mod content               |
-| Rook  | QA & Release Engineer                     | Build verification, CI monitoring, bug reproduction, release artifacts         |
+| Name   | Role                                      | Domain                                                                         |
+| ------ | ----------------------------------------- | ------------------------------------------------------------------------------ |
+| Bridge | Crew Dispatcher                           | Routes all requests to the correct specialist automatically                    |
+| Sol    | Co-Creative Director, Lead Programmer     | Engine, UI, TypeScript, workflows, PRs, changelog, save system                 |
+| Jesse  | Repository Manager, Community Coordinator | Issues, project board, wiki (operational), labels, milestones, release notes   |
+| Vex    | Content & Lore Architect                  | Authored game data, events, lore, wiki (lore pages), mod content               |
+| Rook   | QA & Release Engineer                     | Build verification, CI monitoring, bug reproduction, release artifacts         |
 
-Human director: **Scott Venable** (Creative Director, final decision authority).
+Human director: **Scotty Venable** (Creative Director, final decision authority).
 
 When Vex needs a data schema change, open an issue via Jesse and flag Sol.
 When Vex finishes a lore wiki page, Jesse can link it from the operational

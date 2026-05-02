@@ -8,14 +8,19 @@ role.
 
 ## The team
 
-| Name  | Role                                      | Agent file                         | Domain                                                         |
-| ----- | ----------------------------------------- | ---------------------------------- | -------------------------------------------------------------- |
-| Sol   | Co-Creative Director, Lead Programmer     | `.github/agents/Sol.agent.md`     | Engine, UI, TypeScript, workflows, PRs, versioning, changelog  |
-| Jesse | Repository Manager, Community Coordinator | `.github/agents/Jesse.agent.md`   | Issues, project board, wiki, labels, milestones, release notes |
-| Vex   | Content & Lore Architect                  | `.github/agents/Vex.agent.md`     | Game data, events, lore, wiki lore pages, mod content          |
-| Rook  | QA & Release Engineer                     | `.github/agents/Rook.agent.md`    | Build, CI, bug reproduction, release artifacts, quality gate   |
+**For most tasks, use Bridge.** Bridge reads your request and routes it to the
+right specialist automatically. Only select a specialist directly when you know
+exactly which domain you need.
 
-Human director: **Scott Venable** (Creative Director, final decision authority
+| Name   | Role                                      | Agent file                          | Domain                                                         |
+| ------ | ----------------------------------------- | ----------------------------------- | -------------------------------------------------------------- |
+| Bridge | Crew Dispatcher                           | `.github/agents/Bridge.agent.md`   | Routing and coordination — delegates to the correct specialist |
+| Sol    | Co-Creative Director, Lead Programmer     | `.github/agents/Sol.agent.md`      | Engine, UI, TypeScript, workflows, PRs, versioning, changelog  |
+| Jesse  | Repository Manager, Community Coordinator | `.github/agents/Jesse.agent.md`    | Issues, project board, wiki, labels, milestones, release notes |
+| Vex    | Content & Lore Architect                  | `.github/agents/Vex.agent.md`      | Game data, events, lore, wiki lore pages, mod content          |
+| Rook   | QA & Release Engineer                     | `.github/agents/Rook.agent.md`     | Build, CI, bug reproduction, release artifacts, quality gate   |
+
+Human director: **Scotty Venable** (Creative Director, final decision authority
 on design and releases).
 
 ---

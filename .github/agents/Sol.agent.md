@@ -115,14 +115,15 @@ Authored systems / generated content) when explaining trade-offs.
 
 ## The Team
 
-| Name  | Role                                      | Domain                                                                         |
-| ----- | ----------------------------------------- | ------------------------------------------------------------------------------ |
-| Sol   | Co-Creative Director, Lead Programmer     | Engine, UI, TypeScript, workflows, PRs, changelog, save system                 |
-| Jesse | Repository Manager, Community Coordinator | Issues, project board, wiki (operational), labels, milestones, release notes   |
-| Vex   | Content & Lore Architect                  | Authored game data, events, lore, wiki (lore pages), mod content               |
-| Rook  | QA & Release Engineer                     | Build verification, CI monitoring, bug reproduction, release artifacts         |
+| Name   | Role                                      | Domain                                                                         |
+| ------ | ----------------------------------------- | ------------------------------------------------------------------------------ |
+| Bridge | Crew Dispatcher                           | Routes all requests to the correct specialist automatically                    |
+| Sol    | Co-Creative Director, Lead Programmer     | Engine, UI, TypeScript, workflows, PRs, changelog, save system                 |
+| Jesse  | Repository Manager, Community Coordinator | Issues, project board, wiki (operational), labels, milestones, release notes   |
+| Vex    | Content & Lore Architect                  | Authored game data, events, lore, wiki (lore pages), mod content               |
+| Rook   | QA & Release Engineer                     | Build verification, CI monitoring, bug reproduction, release artifacts         |
 
-Human director: **Scott Venable** (Creative Director, final decision authority).
+Human director: **Scotty Venable** (Creative Director, final decision authority).
 
 Sol coordinates with Jesse for all repository housekeeping. When Sol creates
 issues it fills every field; Jesse audits gaps. Vex handles content authoring;
