@@ -1,7 +1,7 @@
 {
   "name": "stellar-reach",
   "private": true,
-  "version": "0.1.0-dev.0",
+  "version": "0.2.0-dev.0",
   "type": "module",
   "main": "electron/main.cjs",
   "description": "Stellar Reach - a sci-fi mobile trading and management simulator (PWA).",
