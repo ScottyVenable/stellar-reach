@@ -1,11 +1,15 @@
 /*
- * Stellar Reach UI — sci-fi datapad, mobile portrait.
+ * Stellar Reach UI — sci-fi datapad.
  *
  * Design rules:
  *  - Dark background, neon accents (cyan, violet, amber).
  *  - Monospace digits where numbers matter.
- *  - All interactive elements >= 44px tall (mobile tap targets).
- *  - Layout assumes a portrait viewport up to 600px wide.
+ *  - All interactive elements >= 44px tall on touch viewports.
+ *  - Mobile-first: default rules below 960px assume portrait; the desktop
+ *    media query at the bottom of this file unfolds a 3-column dashboard
+ *    on viewports >= 960px wide. The break is viewport-driven, not
+ *    user-agent driven, so a desktop browser at any size and a phone in
+ *    landscape both pick the right layout automatically.
  */
 
 :root {
@@ -114,6 +118,16 @@ select {
   background: linear-gradient(180deg, #07101f 0%, #050810 100%);
   border-left: 1px solid var(--line);
   border-right: 1px solid var(--line);
+}
+
+/* The right rail is desktop-only; CSS reveals it inside the media query. */
+.rightrail {
+  display: none;
+}
+
+.rightrail-name {
+  font-size: 15px;
+  letter-spacing: 0.04em;
 }
 
 .topbar {
@@ -694,3 +708,137 @@ select {
   font-size: 13px;
   color: var(--fg-0);
 }
+
+/* ---------------------------------------------------------------------- */
+/* Desktop / wide-viewport layout (>= 960px).                              */
+/*                                                                         */
+/* The .app element is reshaped into a 3-column grid:                      */
+/*   left  : vertical TabBar rail                                          */
+/*   main  : active screen                                                 */
+/*   right : RightRail status summary                                      */
+/*                                                                         */
+/* TopBar spans all three columns at the top. The mobile bottom-bar        */
+/* TabBar styling is replaced with a vertical chip rail. The .rightrail    */
+/* aside becomes visible. The 600px max-width constraint is lifted.        */
+/* ---------------------------------------------------------------------- */
+@media (min-width: 960px) {
+  html,
+  body,
+  #root {
+    /* Wide viewports get a slightly larger base size for legibility. */
+    font-size: 16px;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr) 280px;
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas:
+      'top top top'
+      'tabs main rail';
+    max-width: none;
+    border-left: none;
+    border-right: none;
+    column-gap: 0;
+  }
+
+  .topbar {
+    grid-area: top;
+  }
+
+  /* On desktop the TopBar's station/credits are duplicated in the right
+   * rail; hide the wide central station block to keep the header lean.
+   * The credits + day stay in the TopBar so they remain glanceable from
+   * the main column without scanning right.
+   */
+  .topbar .station {
+    display: none;
+  }
+
+  .screen {
+    grid-area: main;
+    padding: 18px 20px 24px;
+  }
+
+  /* Vertical tab rail. Reset the mobile fixed-bottom positioning. */
+  .tabbar {
+    grid-area: tabs;
+    position: static;
+    inset: auto;
+    margin: 0;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 12px 8px;
+    border-top: none;
+    border-right: 1px solid var(--line);
+    background: rgba(5, 8, 16, 0.85);
+  }
+
+  .tabbar button {
+    text-align: left;
+    padding: 12px 12px;
+    font-size: 12px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+  }
+
+  .tabbar button.active {
+    border-color: rgba(34, 211, 238, 0.35);
+  }
+
+  .rightrail {
+    grid-area: rail;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 14px 24px;
+    border-left: 1px solid var(--line);
+    background: rgba(5, 8, 16, 0.6);
+    overflow-y: auto;
+  }
+
+  .rightrail .card {
+    margin-bottom: 0;
+  }
+
+  /* The starmap is intrinsically square; cap it on desktop so it doesn't
+   * push the rest of the Helm content offscreen on widescreen viewports.
+   */
+  .starmap {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Modals slot into the dashboard rather than sliding from the bottom.
+   * They still center the content but use a desktop-shaped panel.
+   */
+  .modal {
+    margin: auto;
+    max-width: 640px;
+    border-top: 1px solid var(--accent-cyan);
+    border-radius: var(--radius-md);
+    max-height: 80vh;
+  }
+}
+
+@media (min-width: 1280px) {
+  .app {
+    grid-template-columns: 220px minmax(0, 1fr) 320px;
+  }
+
+  .screen {
+    padding: 22px 28px 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+

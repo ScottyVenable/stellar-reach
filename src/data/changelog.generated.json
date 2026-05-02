@@ -1,8 +1,8 @@
 {
   "currentVersion": "0.2.0-dev.0",
-  "build": 2,
+  "build": 21,
   "channel": "development",
-  "generatedAt": "2026-05-02T19:12:20.113Z",
+  "generatedAt": "2026-05-02T19:44:43.621Z",
   "releases": [
     {
       "version": "Unreleased",
@@ -11,6 +11,13 @@
       "title": "",
       "description": "",
       "categories": [
+        {
+          "id": "features",
+          "label": "New",
+          "entries": [
+            "Responsive desktop layout. Viewports `>= 960px` wide unfold a 16:9 dashboard with a vertical tab rail on the left, the active screen in the center, and a live status rail on the right (credits, day, station summary, ship hull / fuel / cargo). Viewports `< 960px` keep the portrait stack unchanged. The break is viewport-driven, not user-agent driven. Electron windows now open at 1280x720 with a 960x540 minimum, and the PWA manifest no longer locks orientation to portrait. (#89)"
+          ]
+        },
         {
           "id": "improvements",
           "label": "Improvements",
