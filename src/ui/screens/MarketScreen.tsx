@@ -3,6 +3,7 @@ import { useGameStore } from '../../state/store';
 import { currentStation, priceMultipliers } from '../../engine/game';
 import { GOODS_BY_ID } from '../../data/goods';
 import type { GoodCategory } from '../../engine/types';
+import { PanelHeader } from '../components/PanelHeader';
 
 const CATEGORIES: ('All' | GoodCategory)[] = [
   'All',
@@ -48,12 +49,12 @@ export function MarketScreen() {
   return (
     <div>
       <div className="card">
-        <div className="row spread">
-          <h3 style={{ margin: 0 }}>Market</h3>
-          <span className="tiny mono">
-            BUY x{muls.buy.toFixed(2)} / SELL x{muls.sell.toFixed(2)}
-          </span>
-        </div>
+        <PanelHeader
+          tag="MARKET"
+          code="FN03"
+          status="ok"
+          rightSlot={`BUY x${muls.buy.toFixed(2)} / SELL x${muls.sell.toFixed(2)}`}
+        />
         <div className="scroll-x" role="tablist" aria-label="Category filter">
           {CATEGORIES.map((c) => (
             <button

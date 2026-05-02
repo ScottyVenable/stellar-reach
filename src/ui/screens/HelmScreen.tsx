@@ -6,6 +6,7 @@ import { RACES_BY_ID } from '../../data/races';
 import { GOODS_BY_ID } from '../../data/goods';
 import { GalaxyMap } from '../components/GalaxyMap';
 import { SystemMap } from '../components/SystemMap';
+import { PanelHeader } from '../components/PanelHeader';
 
 type SafetyChoice = 'safe' | 'fast';
 
@@ -68,7 +69,7 @@ export function HelmScreen() {
   return (
     <div>
       <div className="card">
-        <h3>Star Map</h3>
+        <PanelHeader tag="STARMAP" code="FN04" status="ok" rightSlot={`${game.galaxy.systems.length} SYS`} />
         {galaxyMapEnabled ? (
           <>
             <GalaxyMap
@@ -90,7 +91,7 @@ export function HelmScreen() {
           </>
         ) : (
           <div className="starmap">
-          <svg viewBox="0 0 1000 1000">
+            <svg viewBox="0 0 1000 1000">
             {game.galaxy.systems.map((sys) => {
               const isCurrent = sys.id === system?.id;
               const isSelected = target && targetSys?.id === sys.id;
@@ -123,12 +124,12 @@ export function HelmScreen() {
               );
             })}
           </svg>
-        </div>
+          </div>
         )}
       </div>
 
       <div className="card">
-        <h3>Destinations</h3>
+        <PanelHeader tag="DESTINATIONS" code="FN04A" status="ok" />
         <div className="list">
           {stations.map((s) => {
             const sys = game.galaxy.systems.find((y) => y.stations.some((st) => st.id === s.id));
@@ -155,7 +156,7 @@ export function HelmScreen() {
 
       {target && route && (
         <div className="card">
-          <h3>Plot Course</h3>
+          <PanelHeader tag="PLOT" code="FN04B" status={canTravel ? 'ok' : 'warn'} />
           <div className="row" style={{ marginBottom: 8 }}>
             <button className={`chip ${safety === 'safe' ? 'active' : ''}`} onClick={() => setSafety('safe')}>
               Safe Route

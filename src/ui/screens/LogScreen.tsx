@@ -1,4 +1,5 @@
 import { useGameStore } from '../../state/store';
+import { PanelHeader } from '../components/PanelHeader';
 
 export function LogScreen() {
   const game = useGameStore((s) => s.game)!;
@@ -8,7 +9,7 @@ export function LogScreen() {
   return (
     <div>
       <div className="card">
-        <h3>Captain's Log</h3>
+        <PanelHeader tag="LOG" code="FN07" status="ok" rightSlot={`D${String(game.player.day).padStart(3, '0')}`} />
         <div className="tiny">Galaxy seed: <span className="mono cyan">{game.galaxy.seed}</span></div>
         <div className="tiny">Captain: {game.player.captainName}</div>
         <div className="divider" />
@@ -19,7 +20,7 @@ export function LogScreen() {
         ))}
       </div>
       <div className="card">
-        <h3>Danger Zone</h3>
+        <PanelHeader tag="DANGER" code="FN99" status="alert" />
         <button
           className="danger"
           onClick={() => {

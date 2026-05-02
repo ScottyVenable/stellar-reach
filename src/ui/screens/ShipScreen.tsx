@@ -3,6 +3,7 @@ import { SHIP_MODULES, SHIP_MODULES_BY_ID } from '../../data/modules';
 import { GOODS_BY_ID } from '../../data/goods';
 import { currentStation } from '../../engine/game';
 import type { ShipModuleSlot } from '../../engine/types';
+import { PanelHeader } from '../components/PanelHeader';
 
 const SLOTS: ShipModuleSlot[] = ['Hull', 'Cargo', 'Drive', 'Shield', 'Sensor', 'Utility'];
 
@@ -35,7 +36,12 @@ export function ShipScreen() {
   return (
     <div>
       <div className="card">
-        <h3>Vessel: {ship.name}</h3>
+        <PanelHeader
+          tag="VESSEL"
+          code="FN01"
+          status={ship.hull < ship.hullMax * 0.4 ? 'alert' : ship.fuel < ship.fuelMax * 0.25 ? 'warn' : 'ok'}
+          rightSlot={ship.name.toUpperCase()}
+        />
         <div className="kv">
           <span className="k">Hull</span>
           <span className="v">{ship.hull}/{ship.hullMax}</span>
