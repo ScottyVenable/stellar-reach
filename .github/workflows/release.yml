@@ -1,11 +1,13 @@
 name: Build and Release
 
-# Builds the PWA on every push and pull request, then publishes a GitHub
-# Release containing the production bundle.
+# Builds the PWA on every push and pull request, then publishes pre-releases.
 #
-# • Push to main  → creates/updates a rolling "latest" pre-release.
-# • Pull requests → creates a per-PR pre-release keyed by PR number + SHA.
-# • workflow_dispatch → triggers a manual build and pre-release from any branch.
+# • Push to main / workflow_dispatch → three pre-releases:
+#     - latest-main        (web PWA zip)
+#     - latest-windows     (Windows Electron .exe installer)
+#     - latest-android     (Android debug APK)
+# • Pull requests → three per-PR pre-releases with the same assets.
+# • workflow_dispatch → same as push-to-main with an optional tag override.
 
 on:
   push:
@@ -15,7 +17,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Override release tag (default: manual-<sha>)'
+        description: 'Override release tag suffix (default: manual-<sha>)'
         required: false
         default: ''
 
@@ -27,6 +29,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ─── 1. Web build (typecheck + Vite bundle) ────────────────────────────────
   build:
     runs-on: ubuntu-latest
     outputs:
@@ -52,7 +55,15 @@ jobs:
         env:
           VITE_BASE: './'
 
-      - name: Package bundle
+      # Upload raw dist/ so the Electron and Android jobs can reuse it.
+      - name: Upload dist folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: stellar-reach-dist
+          path: dist/
+          if-no-files-found: error
+
+      - name: Package web bundle
         id: bundle
         run: |
           set -euo pipefail
@@ -60,21 +71,101 @@ jobs:
           ( cd dist && zip -r "../$NAME" . )
           echo "bundle-name=$NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Upload bundle artifact
+      - name: Upload web bundle artifact
         uses: actions/upload-artifact@v4
         with:
           name: stellar-reach-bundle
           path: ${{ steps.bundle.outputs.bundle-name }}
           if-no-files-found: error
 
+  # ─── 2. Windows Electron installer (.exe) ──────────────────────────────────
+  build-windows:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Reuse the dist/ built in the web job instead of rebuilding.
+      - name: Download dist folder
+        uses: actions/download-artifact@v4
+        with:
+          name: stellar-reach-dist
+          path: dist
+
+      - name: Build Electron installer
+        run: npx electron-builder --win --publish never
+
+      - name: Upload Windows installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stellar-reach-windows
+          path: dist-electron/*.exe
+          if-no-files-found: error
+
+  # ─── 3. Android debug APK (Capacitor + Gradle) ─────────────────────────────
+  build-android:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Reuse the dist/ built in the web job.
+      - name: Download dist folder
+        uses: actions/download-artifact@v4
+        with:
+          name: stellar-reach-dist
+          path: dist
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Sync web assets into Android project
+        run: npx cap sync android
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --no-daemon
+        working-directory: android
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stellar-reach-android
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+  # ─── 4a. PR web release ────────────────────────────────────────────────────
   release-pr:
-    # Publishes a "PR build" release on every pull request from this repo.
-    # Forks cannot create releases (no write token), so we skip them.
     needs: build
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - name: Download bundle
+      - name: Download web bundle
         uses: actions/download-artifact@v4.1.7
         with:
           name: stellar-reach-bundle
@@ -91,17 +182,17 @@ jobs:
           SHORT="${HEAD_SHA::8}"
           TAG="pr-${PR_NUMBER}-${SHORT}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "name=Stellar Reach PR #${PR_NUMBER} (${SHORT})" >> "$GITHUB_OUTPUT"
+          echo "name=Stellar Reach PR #${PR_NUMBER} — Web (${SHORT})" >> "$GITHUB_OUTPUT"
           {
             echo 'body<<EOF'
             echo "PR: #${PR_NUMBER} - ${PR_TITLE}"
             echo "Commit: ${HEAD_SHA}"
             echo
-            echo "Download the attached zip and serve it as a static site (or open index.html directly via http) to play this build."
+            echo "Download the zip, unzip it, and open \`index.html\` via a local HTTP server to play this build."
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
-      - name: Create or update PR release
+      - name: Create or update PR web release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
@@ -111,15 +202,99 @@ jobs:
           files: ./bundle/*
           target_commitish: ${{ github.event.pull_request.head.sha }}
 
+  # ─── 4b. PR Windows release ────────────────────────────────────────────────
+  release-pr-windows:
+    needs: build-windows
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: stellar-reach-windows
+          path: ./installer
+
+      - name: Compute release metadata
+        id: meta
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          SHORT="${HEAD_SHA::8}"
+          TAG="pr-${PR_NUMBER}-${SHORT}-windows"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=Stellar Reach PR #${PR_NUMBER} — Windows (${SHORT})" >> "$GITHUB_OUTPUT"
+          {
+            echo 'body<<EOF'
+            echo "PR: #${PR_NUMBER} - ${PR_TITLE}"
+            echo "Commit: ${HEAD_SHA}"
+            echo
+            echo "Download and run the .exe installer to play this build on Windows."
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or update PR Windows release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          body: ${{ steps.meta.outputs.body }}
+          prerelease: true
+          files: ./installer/*
+          target_commitish: ${{ github.event.pull_request.head.sha }}
+
+  # ─── 4c. PR Android release ────────────────────────────────────────────────
+  release-pr-android:
+    needs: build-android
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: stellar-reach-android
+          path: ./apk
+
+      - name: Compute release metadata
+        id: meta
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          SHORT="${HEAD_SHA::8}"
+          TAG="pr-${PR_NUMBER}-${SHORT}-android"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=Stellar Reach PR #${PR_NUMBER} — Android APK (${SHORT})" >> "$GITHUB_OUTPUT"
+          {
+            echo 'body<<EOF'
+            echo "PR: #${PR_NUMBER} - ${PR_TITLE}"
+            echo "Commit: ${HEAD_SHA}"
+            echo
+            echo "Download the APK and install it on Android (enable 'Install unknown apps' in settings)."
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or update PR Android release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          body: ${{ steps.meta.outputs.body }}
+          prerelease: true
+          files: ./apk/*
+          target_commitish: ${{ github.event.pull_request.head.sha }}
+
+  # ─── 5a. Main/manual web release ───────────────────────────────────────────
   release-main:
-    # Publishes a rolling pre-release whenever main is updated or a manual run
-    # is triggered. The "latest-main" tag is reused so there is always exactly
-    # one "latest" pre-release to download.
     needs: build
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - name: Download bundle
+      - name: Download web bundle
         uses: actions/download-artifact@v4.1.7
         with:
           name: stellar-reach-bundle
@@ -140,18 +315,18 @@ jobs:
             TAG="latest-main"
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          echo "name=Stellar Reach — ${TAG} (${SHORT})" >> "$GITHUB_OUTPUT"
+          echo "name=Stellar Reach — Web ${TAG} (${SHORT})" >> "$GITHUB_OUTPUT"
           {
             echo 'body<<EOF'
             echo "Branch: ${GITHUB_REF_NAME}"
             echo "Commit: ${GITHUB_SHA}"
             echo "Triggered by: ${GITHUB_EVENT_NAME}"
             echo
-            echo "Download the attached zip, unzip it, and open \`index.html\` via a local http server (or use \`npx serve .\`) to play this build."
+            echo "Download the zip, unzip it, and open \`index.html\` via a local HTTP server (or \`npx serve .\`) to play this build."
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
-      - name: Create or update release
+      - name: Create or update web release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.tag }}
@@ -159,4 +334,100 @@ jobs:
           body: ${{ steps.meta.outputs.body }}
           prerelease: true
           files: ./bundle/*
+          target_commitish: ${{ github.sha }}
+
+  # ─── 5b. Main/manual Windows release ───────────────────────────────────────
+  release-windows:
+    needs: build-windows
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: stellar-reach-windows
+          path: ./installer
+
+      - name: Compute release metadata
+        id: meta
+        env:
+          INPUT_TAG: ${{ github.event.inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          SHORT="${GITHUB_SHA::8}"
+          if [ -n "${INPUT_TAG}" ]; then
+            TAG="${INPUT_TAG}-windows"
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="manual-${SHORT}-windows"
+          else
+            TAG="latest-windows"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=Stellar Reach — Windows ${TAG} (${SHORT})" >> "$GITHUB_OUTPUT"
+          {
+            echo 'body<<EOF'
+            echo "Branch: ${GITHUB_REF_NAME}"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Triggered by: ${GITHUB_EVENT_NAME}"
+            echo
+            echo "Download and run the .exe installer to play Stellar Reach on Windows."
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or update Windows release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          body: ${{ steps.meta.outputs.body }}
+          prerelease: true
+          files: ./installer/*
+          target_commitish: ${{ github.sha }}
+
+  # ─── 5c. Main/manual Android release ───────────────────────────────────────
+  release-android:
+    needs: build-android
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: stellar-reach-android
+          path: ./apk
+
+      - name: Compute release metadata
+        id: meta
+        env:
+          INPUT_TAG: ${{ github.event.inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          SHORT="${GITHUB_SHA::8}"
+          if [ -n "${INPUT_TAG}" ]; then
+            TAG="${INPUT_TAG}-android"
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="manual-${SHORT}-android"
+          else
+            TAG="latest-android"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=Stellar Reach — Android APK ${TAG} (${SHORT})" >> "$GITHUB_OUTPUT"
+          {
+            echo 'body<<EOF'
+            echo "Branch: ${GITHUB_REF_NAME}"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Triggered by: ${GITHUB_EVENT_NAME}"
+            echo
+            echo "Download the APK and sideload it on Android (Settings → 'Install unknown apps')."
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or update Android release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          body: ${{ steps.meta.outputs.body }}
+          prerelease: true
+          files: ./apk/*
           target_commitish: ${{ github.sha }}

@@ -1,0 +1,26 @@
+# electron-builder configuration for Stellar Reach.
+# Produces a one-click NSIS installer (.exe) for Windows x64.
+# Run: npx electron-builder --win --publish never
+
+appId: com.stellarreach.game
+productName: Stellar Reach
+
+directories:
+  output: dist-electron
+
+# Files to bundle inside the packaged app.
+files:
+  - dist/**/*
+  - electron/**/*
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: public/icon-512.png
+
+nsis:
+  oneClick: true
+  perMachine: false
+  allowToChangeInstallationDirectory: false

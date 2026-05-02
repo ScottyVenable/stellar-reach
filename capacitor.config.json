@@ -1,0 +1,8 @@
+{
+  "appId": "com.stellarreach.game",
+  "appName": "Stellar Reach",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
