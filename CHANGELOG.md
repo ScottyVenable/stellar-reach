@@ -28,6 +28,22 @@ Categories (omit a category if it has no entries):
 -->
 
 ### Features
+- UI rehaul: bridge-console identity. Self-hosted typography pairing
+  (Chakra Petch for HUD chrome and headings, Space Grotesk for body
+  copy, JetBrains Mono for numerics and labels). Desktop adopts a full
+  HUD strip across the top with stardate, callsign, hull / fuel / cargo
+  bars, credits, and net worth; the left tab rail becomes vertical
+  console buttons with iconography and `Fn` hotkey hints; the right rail
+  picks up a live news ticker and trade-hold readout. Mobile keeps its
+  portrait stack but gains the same icon set on the bottom bar and a
+  contextual breadcrumb on every screen. Each active screen now renders
+  inside a thin "viewport" frame with corner brackets, fading in on
+  navigation (or instantly under reduced motion). (#100)
+- Settings modal. New gear button in the HUD opens a Settings dialog
+  with three controls: font scale (Small / Standard / Large / XL),
+  density (Comfortable / Compact), and motion (System / Reduce / Full).
+  Persisted to `localStorage` independently of the game save, so they
+  survive new game and reset. (#100)
 - Responsive desktop layout. Viewports `>= 960px` wide unfold a 16:9
   dashboard with a vertical tab rail on the left, the active screen in
   the center, and a live status rail on the right (credits, day, station

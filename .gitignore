@@ -19,5 +19,9 @@ coverage
 ../internal-dev-docs/
 internal-dev-docs/
 
-# Screenshot evidence captured by Sol and Rook during PR review — not committed.
+# Screenshot evidence captured by Sol and Rook during PR review — not committed
+# by default. PR-embed attachment subfolders are explicitly allowed so the
+# images referenced from PR descriptions resolve from the repo.
 screenshots/
+!screenshots/pr-*-attachments/
+!screenshots/pr-*-attachments/**
