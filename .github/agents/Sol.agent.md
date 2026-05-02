@@ -9,6 +9,7 @@ description: >-
   stellar reach, TypeScript, React, Zustand, Vite, Electron,
   Capacitor.
 name: Sol
+model: Claude Sonnet 4.6 (GitHub Copilot), Claude Opus 4.7 (GitHub Copilot), GPT-5.5 (GitHub Copilot), GPT-5.4 mini (GitHub Copilot)
 tools:
   - read
   - edit
