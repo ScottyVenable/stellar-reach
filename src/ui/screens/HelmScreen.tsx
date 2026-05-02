@@ -4,6 +4,8 @@ import { allStations, currentStation, currentSystem } from '../../engine/game';
 import { estimateRoute } from '../../engine/game';
 import { RACES_BY_ID } from '../../data/races';
 import { GOODS_BY_ID } from '../../data/goods';
+import { GalaxyMap } from '../components/GalaxyMap';
+import { SystemMap } from '../components/SystemMap';
 
 type SafetyChoice = 'safe' | 'fast';
 
@@ -15,6 +17,7 @@ const MAX_TRADE_HINTS = 4;
 export function HelmScreen() {
   const game = useGameStore((s) => s.game)!;
   const beginTrip = useGameStore((s) => s.beginTrip);
+  const galaxyMapEnabled = useGameStore((s) => s.flags.galaxyMap);
 
   const [selected, setSelected] = useState<string | null>(null);
   const [safety, setSafety] = useState<SafetyChoice>('safe');
@@ -66,7 +69,27 @@ export function HelmScreen() {
     <div>
       <div className="card">
         <h3>Star Map</h3>
-        <div className="starmap">
+        {galaxyMapEnabled ? (
+          <>
+            <GalaxyMap
+              galaxy={game.galaxy}
+              currentSystemId={system?.id}
+              selectedSystemId={targetSys?.id}
+              onSelectSystem={(sys) => setSelected(sys.stations[0]?.id ?? null)}
+            />
+            {targetSys && (
+              <div style={{ marginTop: 12 }}>
+                <SystemMap
+                  system={targetSys}
+                  currentStationId={station?.id}
+                  selectedStationId={selected ?? undefined}
+                  onSelectStation={(st) => setSelected(st.id)}
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="starmap">
           <svg viewBox="0 0 1000 1000">
             {game.galaxy.systems.map((sys) => {
               const isCurrent = sys.id === system?.id;
@@ -101,6 +124,7 @@ export function HelmScreen() {
             })}
           </svg>
         </div>
+        )}
       </div>
 
       <div className="card">

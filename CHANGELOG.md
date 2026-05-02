@@ -32,6 +32,13 @@ Categories (omit a category if it has no entries):
   forward automatically on load. Legacy saves written by v0.1.x are detected
   by the old key and migrated seamlessly — no save lost on upgrade. (#21)
 
+### Internal
+- Galaxy map renderer scaffold. Adds `GalaxyMap`, `SystemMap`, and
+  `MiniMap` SVG components plus a `flags.galaxyMap` feature flag in the
+  Zustand store. The Helm screen renders the new components only when
+  the flag is on; default is off, so existing behaviour is unchanged.
+  Full implementation lands across three sub-issues of #91. (Refs #91)
+
 ### Bug Fixes
 - Replaced `Math.random()` bootstrap calls in `src/engine/rng.ts` and
   `src/engine/game.ts` with `crypto.getRandomValues()`, satisfying the

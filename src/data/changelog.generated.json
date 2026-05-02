@@ -1,8 +1,8 @@
 {
   "currentVersion": "0.2.0-dev.0",
-  "build": 2,
+  "build": 21,
   "channel": "development",
-  "generatedAt": "2026-05-02T19:12:20.113Z",
+  "generatedAt": "2026-05-02T19:53:30.955Z",
   "releases": [
     {
       "version": "Unreleased",
@@ -16,6 +16,13 @@
           "label": "Improvements",
           "entries": [
             "Save files now carry a version envelope (`{ v, state }`) and migrate forward automatically on load. Legacy saves written by v0.1.x are detected by the old key and migrated seamlessly — no save lost on upgrade. (#21)"
+          ]
+        },
+        {
+          "id": "internal",
+          "label": "Internal",
+          "entries": [
+            "Galaxy map renderer scaffold. Adds `GalaxyMap`, `SystemMap`, and `MiniMap` SVG components plus a `flags.galaxyMap` feature flag in the Zustand store. The Helm screen renders the new components only when the flag is on; default is off, so existing behaviour is unchanged. Full implementation lands across three sub-issues of #91. (Refs #91)"
           ]
         },
         {
