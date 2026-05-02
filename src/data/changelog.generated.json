@@ -1,8 +1,8 @@
 {
   "currentVersion": "0.2.0-dev.0",
-  "build": 24,
+  "build": 2,
   "channel": "development",
-  "generatedAt": "2026-05-02T20:39:40.601Z",
+  "generatedAt": "2026-05-02T21:23:59.891Z",
   "releases": [
     {
       "version": "Unreleased",

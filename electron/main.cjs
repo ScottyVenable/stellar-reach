@@ -8,7 +8,7 @@ const path = require('path');
 
 function createWindow() {
   const win = new BrowserWindow({
-    icon: path.join(__dirname, '..', 'public', 'stellar-reach-icon.ico'),
+    icon: path.join(__dirname, 'icon.png'),
     width: 1280,
     height: 720,
     minWidth: 960,

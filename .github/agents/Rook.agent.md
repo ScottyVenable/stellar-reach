@@ -1,4 +1,4 @@
-﻿---
+---
 description: >-
   Use when: verifying builds, diagnosing CI failures, reproducing bugs,
   auditing release readiness, managing the packaging pipeline (Electron,

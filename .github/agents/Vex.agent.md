@@ -1,4 +1,4 @@
-﻿---
+---
 description: >-
   Use when: authoring or editing game content — goods, ship modules, crew
   traits, race profiles, name tables, event cards, mission text, news headlines,

@@ -1,4 +1,4 @@
-﻿---
+---
 description: >-
   Main entry point for all Stellar Reach development work. Bridge reads the
   request, identifies the right specialist, and delegates automatically.

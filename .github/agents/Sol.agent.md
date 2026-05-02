@@ -1,4 +1,4 @@
-﻿---
+---
 description: >-
   Use when: implementing or reviewing Stellar Reach source code — engine
   systems, UI components, CI workflows, versioning, changelog, TypeScript
