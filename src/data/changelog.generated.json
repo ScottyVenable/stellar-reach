@@ -1,8 +1,8 @@
 {
   "currentVersion": "0.2.0-dev.0",
-  "build": 25,
+  "build": 29,
   "channel": "development",
-  "generatedAt": "2026-05-02T21:45:13.299Z",
+  "generatedAt": "2026-05-02T21:48:55.599Z",
   "releases": [
     {
       "version": "Unreleased",
@@ -15,6 +15,8 @@
           "id": "features",
           "label": "New",
           "entries": [
+            "UI rehaul: bridge-console identity. Self-hosted typography pairing (Chakra Petch for HUD chrome and headings, Space Grotesk for body copy, JetBrains Mono for numerics and labels). Desktop adopts a full HUD strip across the top with stardate, callsign, hull / fuel / cargo bars, credits, and net worth; the left tab rail becomes vertical console buttons with iconography and `Fn` hotkey hints; the right rail picks up a live news ticker and trade-hold readout. Mobile keeps its portrait stack but gains the same icon set on the bottom bar and a contextual breadcrumb on every screen. Each active screen now renders inside a thin \"viewport\" frame with corner brackets, fading in on navigation (or instantly under reduced motion). (#100)",
+            "Settings modal. New gear button in the HUD opens a Settings dialog with three controls: font scale (Small / Standard / Large / XL), density (Comfortable / Compact), and motion (System / Reduce / Full). Persisted to `localStorage` independently of the game save, so they survive new game and reset. (#100)",
             "Responsive desktop layout. Viewports `>= 960px` wide unfold a 16:9 dashboard with a vertical tab rail on the left, the active screen in the center, and a live status rail on the right (credits, day, station summary, ship hull / fuel / cargo). Viewports `< 960px` keep the portrait stack unchanged. The break is viewport-driven, not user-agent driven. Electron windows now open at 1280x720 with a 960x540 minimum, and the PWA manifest no longer locks orientation to portrait. (#89)"
           ]
         },
