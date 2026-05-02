@@ -18,7 +18,7 @@ win:
     - target: nsis
       arch:
         - x64
-  icon: public/icon-512.png
+  icon: electron/icon.png
 
 nsis:
   oneClick: true
