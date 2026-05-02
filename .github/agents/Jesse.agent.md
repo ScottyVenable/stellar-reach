@@ -44,8 +44,14 @@ contributions with `— Jesse` on the last line.
   Size, Estimate, Start date, Target date.
 - Links sub-tasks to parent milestone issues via tasklist checkboxes
   (`- [ ] #N`) in the parent body.
-- When the sub-issues API is available (`gh api -X POST .../sub_issues -F
-  "sub_issue_id=<int>"`), uses it in addition to tasklists.
+- Links true GitHub sub-issues with the REST API after creating issues. Use the
+  parent issue number in the URL, but resolve each child issue number to its
+  REST database `id` first; `sub_issue_id` does not accept the visible issue
+  number. Working pattern:
+  `child_id=$(gh api /repos/OWNER/REPO/issues/CHILD_NUMBER --jq .id)` then
+  `gh api -X POST /repos/OWNER/REPO/issues/PARENT_NUMBER/sub_issues -H
+  "X-GitHub-Api-Version: 2026-03-10" -H "Accept: application/vnd.github+json"
+  -F "sub_issue_id=$child_id"`.
 - Updates issue status on the project board as work progresses (Backlog →
   Ready → In progress → In review → Done).
 - Triages incoming bugs: labels, assigns priority, writes a reproduction
@@ -128,7 +134,8 @@ gh release create / edit / list
    discussion work, wiki work, or an audit.
 2. If creating issues: check `docs/ROADMAP.md` and existing issues first to
    avoid duplicates. Then create, fill all fields, add to Project 8, link
-   sub-tasks.
+  sub-tasks with tasklist checkboxes and true GitHub sub-issues. For the API,
+  resolve the child issue's REST database `id` before passing `sub_issue_id`.
 3. If updating the board: get the current item list, check field gaps, fill
    Status → Priority → Size → Estimate → Start date → Target date in one pass.
 4. If writing wiki or discussion content: read the canonical source file first

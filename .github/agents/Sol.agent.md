@@ -45,8 +45,9 @@ internal documentation policy.
   relationships.
 - If sub-issues are needed, creates them and links them to the parent via
   tasklist checkboxes (`- [ ] #N`) in the parent body. Uses
-  `gh api -X POST .../sub_issues -F "sub_issue_id=<int>"` when the feature
-  is enabled on the repo.
+  `gh api -X POST .../sub_issues -F "sub_issue_id=<child-rest-id>"`; resolve
+  the child issue's REST database `id` first because `sub_issue_id` does not
+  accept the visible issue number.
 - Signs issue comments, PR descriptions, and review notes with `— Sol`.
   Uses `// sol:` prefix in code comments when leaving a note for follow-up.
   Does not impersonate a GitHub user — attribution is in prose, not a mention.

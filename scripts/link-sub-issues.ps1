@@ -3,8 +3,8 @@
 .SYNOPSIS
   Links all sub-issues to their milestone parents via the GitHub sub-issues API.
   All sub-issues already exist: #52-#64 (M10-M13) and #17-#51 (M14-M22).
-  Requires GitHub sub-issues beta to be enabled:
-    GitHub.com -> Settings -> Feature preview -> Sub-issues -> Enable
+  Resolves each visible issue number to the issue's REST database id before
+  posting. The sub_issue_id body field does NOT accept the visible issue number.
   Uses -F (capital F) to send integers and X-GitHub-Api-Version: 2026-03-10.
   Safe to re-run — already-linked items return a 422 which is logged and skipped.
 #>
@@ -14,12 +14,20 @@ $owner = "ScottyVenable"
 
 function Connect-SubIssue {
   param([int]$parentNum, [int]$childNum)
+
+  $childId = gh api "/repos/$repo/issues/$childNum" --jq ".id" 2>&1
+  if ($LASTEXITCODE -ne 0) {
+    Write-Warning "  Could not resolve REST id for #$childNum : $childId"
+    return
+  }
+
   $result = gh api -X POST "/repos/$repo/issues/$parentNum/sub_issues" `
     -H "X-GitHub-Api-Version: 2026-03-10" `
-    -F "sub_issue_id=$childNum" 2>&1
+    -H "Accept: application/vnd.github+json" `
+    -F "sub_issue_id=$childId" 2>&1
   if ($LASTEXITCODE -eq 0) {
     Write-Host "  Linked #$childNum -> #$parentNum"
-  } elseif ($result -match "already") {
+  } elseif ($result -match "duplicate" -or $result -match "already" -or $result -match "only have one parent") {
     Write-Host "  Already linked #$childNum -> #$parentNum (skipped)"
   } else {
     Write-Warning "  Link FAILED #$childNum -> #$parentNum : $result"

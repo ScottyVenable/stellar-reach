@@ -3,6 +3,8 @@
 .SYNOPSIS
   Creates sub-issues for all Galactic Trader milestone issues and links them
   to their parent via the GitHub sub-issues REST API.
+   The sub_issue_id field expects the child issue's REST database id, not its
+   visible issue number.
   Run once from the repo root.
 #>
 
@@ -231,18 +233,25 @@ foreach ($parentNum in $subIssues.Keys) {
     $childNum = ($url -split "/")[-1]
     Write-Host "  -> #$childNum $url"
 
+      # Add the new sub-issue to Project 8 before linking.
+      gh project item-add 8 --owner $owner --url $url 2>&1 | Out-Null
+
+      $childId = gh api "/repos/$repo/issues/$childNum" --jq ".id" 2>&1
+      if ($LASTEXITCODE -ne 0) {
+         Write-Warning "  Could not resolve REST id for #$childNum : $childId"
+         continue
+      }
+
     # Link to parent via sub-issues API
     $linkResult = gh api -X POST "/repos/$repo/issues/$parentNum/sub_issues" `
       -H "X-GitHub-Api-Version: 2026-03-10" `
-      -F "sub_issue_id=$childNum" 2>&1
+         -H "Accept: application/vnd.github+json" `
+         -F "sub_issue_id=$childId" 2>&1
     if ($LASTEXITCODE -ne 0) {
       Write-Warning "  Link FAILED: $linkResult"
     } else {
       Write-Host "  Linked #$childNum -> #$parentNum"
     }
-
-    # Add the new sub-issue to Project 8 as well
-    gh project item-add 8 --owner $owner --url $url 2>&1 | Out-Null
 
     $allCreated[$childNum] = $parentNum
   }
