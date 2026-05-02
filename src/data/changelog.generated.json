@@ -1,8 +1,8 @@
 {
-  "currentVersion": "0.1.0-dev.0",
-  "build": 10,
+  "currentVersion": "0.2.0-dev.0",
+  "build": 2,
   "channel": "development",
-  "generatedAt": "2026-05-02T16:21:04.643Z",
+  "generatedAt": "2026-05-02T19:12:20.113Z",
   "releases": [
     {
       "version": "Unreleased",
@@ -12,15 +12,32 @@
       "description": "",
       "categories": [
         {
+          "id": "improvements",
+          "label": "Improvements",
+          "entries": [
+            "Save files now carry a version envelope (`{ v, state }`) and migrate forward automatically on load. Legacy saves written by v0.1.x are detected by the old key and migrated seamlessly — no save lost on upgrade. (#21)"
+          ]
+        },
+        {
+          "id": "bug-fixes",
+          "label": "Fixes",
+          "entries": [
+            "Replaced `Math.random()` bootstrap calls in `src/engine/rng.ts` and `src/engine/game.ts` with `crypto.getRandomValues()`, satisfying the determinism policy. The UI and engine no longer call `Math.random` anywhere. (#22)"
+          ]
+        },
+        {
           "id": "internal",
           "label": "Internal",
           "entries": [
+            "Bumped CI and release workflows from Node.js 20 to Node.js 22 to satisfy the Capacitor CLI minimum requirement (`>=22`); also updated the Android build job from Java 17 to Java 21 to match Gradle's `sourceCompatibility` target and avoid the `invalid source release: 21` build error.",
             "Established three-tier branch model (`development` -> `alpha` -> `main`) with `development` as the default branch.",
             "Introduced the **Sol** agent persona and the operating manual at `.github/copilot-instructions.md`.",
             "Added issue templates, PR template, CODEOWNERS, label catalog, and the `Galactic Trader` Project workflow conventions.",
             "Added the version-bump and build-number automation (`scripts/version.mjs`, `.github/workflows/version-bump.yml`).",
             "Added the mod-loader scaffold under `mods/` with an example mod and a draft JSON schema in `src/engine/mods.ts`.",
-            "Added the in-game changelog viewer accessible from the title screen."
+            "Added the in-game changelog viewer accessible from the title screen.",
+            "Bumped version to 0.2.0-dev.0 to mark Phase A (Foundations and Pipeline) complete and gate the `development -> alpha` promotion. (#23)",
+            "Corrected stale `galactic-trader` repository references in README badges and links to point at the live `stellar-reach` repository. (#24)"
           ]
         }
       ]
