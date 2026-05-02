@@ -1,15 +1,23 @@
 name: Build and Release
 
 # Builds the PWA on every push and pull request, then publishes a GitHub
-# Release containing the production bundle for every PR. The release tag is
-# derived from the PR number and the head commit SHA so each PR has its own
-# stable, downloadable build.
+# Release containing the production bundle.
+#
+# • Push to main  → creates/updates a rolling "latest" pre-release.
+# • Pull requests → creates a per-PR pre-release keyed by PR number + SHA.
+# • workflow_dispatch → triggers a manual build and pre-release from any branch.
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Override release tag (default: manual-<sha>)'
+        required: false
+        default: ''
 
 permissions:
   contents: write   # required to create releases and upload assets
@@ -102,3 +110,53 @@ jobs:
           prerelease: true
           files: ./bundle/*
           target_commitish: ${{ github.event.pull_request.head.sha }}
+
+  release-main:
+    # Publishes a rolling pre-release whenever main is updated or a manual run
+    # is triggered. The "latest-main" tag is reused so there is always exactly
+    # one "latest" pre-release to download.
+    needs: build
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download bundle
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: stellar-reach-bundle
+          path: ./bundle
+
+      - name: Compute release metadata
+        id: meta
+        env:
+          INPUT_TAG: ${{ github.event.inputs.release_tag }}
+        run: |
+          set -euo pipefail
+          SHORT="${GITHUB_SHA::8}"
+          if [ -n "${INPUT_TAG}" ]; then
+            TAG="${INPUT_TAG}"
+          elif [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="manual-${SHORT}"
+          else
+            TAG="latest-main"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "name=Stellar Reach — ${TAG} (${SHORT})" >> "$GITHUB_OUTPUT"
+          {
+            echo 'body<<EOF'
+            echo "Branch: ${GITHUB_REF_NAME}"
+            echo "Commit: ${GITHUB_SHA}"
+            echo "Triggered by: ${GITHUB_EVENT_NAME}"
+            echo
+            echo "Download the attached zip, unzip it, and open \`index.html\` via a local http server (or use \`npx serve .\`) to play this build."
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or update release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.name }}
+          body: ${{ steps.meta.outputs.body }}
+          prerelease: true
+          files: ./bundle/*
+          target_commitish: ${{ github.sha }}

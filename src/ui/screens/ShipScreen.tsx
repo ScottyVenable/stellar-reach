@@ -1,6 +1,7 @@
 import { useGameStore } from '../../state/store';
 import { SHIP_MODULES, SHIP_MODULES_BY_ID } from '../../data/modules';
 import { GOODS_BY_ID } from '../../data/goods';
+import { currentStation } from '../../engine/game';
 import type { ShipModuleSlot } from '../../engine/types';
 
 const SLOTS: ShipModuleSlot[] = ['Hull', 'Cargo', 'Drive', 'Shield', 'Sensor', 'Utility'];
@@ -21,6 +22,15 @@ export function ShipScreen() {
   const repair = useGameStore((s) => s.repair);
   const ship = game.player.ship;
   const installed = new Set(ship.installedModuleIds);
+  const station = currentStation(game);
+
+  // Compute cargo hold value using current station market prices
+  const holdValue = Object.entries(ship.hold).reduce((sum, [gid, units]) => {
+    const e = station?.market.find((m) => m.goodId === gid);
+    return sum + (e ? e.price * units : 0);
+  }, 0);
+
+  const repairCost = (ship.hullMax - ship.hull) * 18;
 
   return (
     <div>
@@ -54,23 +64,44 @@ export function ShipScreen() {
         <div className="row" style={{ marginTop: 10 }}>
           <button onClick={() => refuel(10)}>Refuel +10 (80cr)</button>
           <button onClick={() => refuel(ship.fuelMax - ship.fuel)}>Top off</button>
+        </div>
+        <div className="row" style={{ marginTop: 6 }}>
           <button onClick={() => repair(10)}>Repair +10 (180cr)</button>
+          <button
+            onClick={() => repair(ship.hullMax - ship.hull)}
+            disabled={ship.hull >= ship.hullMax || game.player.credits < repairCost}
+            title={`Full repair costs ${repairCost}cr`}
+          >
+            Full Repair ({repairCost}cr)
+          </button>
         </div>
       </div>
 
       <div className="card">
-        <h3>Cargo Hold</h3>
+        <div className="row spread">
+          <h3 style={{ margin: 0 }}>Cargo Hold</h3>
+          {holdValue > 0 && (
+            <span className="tiny amber">~{holdValue.toLocaleString()}cr value</span>
+          )}
+        </div>
         {Object.keys(ship.hold).length === 0 && <div className="muted">Hold empty.</div>}
         {Object.entries(ship.hold).map(([gid, units]) => {
           const good = GOODS_BY_ID[gid];
           if (!good) return null;
+          const e = station?.market.find((m) => m.goodId === gid);
+          const lineValue = e ? e.price * units : null;
           return (
             <div key={gid} className="row spread" style={{ padding: '6px 0', borderBottom: '1px solid var(--line)' }}>
               <div>
                 <div>{good.name}</div>
                 <div className="tiny">{good.category} | bulk {good.bulk}</div>
               </div>
-              <div className="mono">{units} u</div>
+              <div className="mono">
+                {units} u
+                {lineValue !== null && (
+                  <div className="tiny amber">~{lineValue.toLocaleString()}cr</div>
+                )}
+              </div>
             </div>
           );
         })}
