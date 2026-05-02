@@ -13,3 +13,5 @@ android
 *.log
 coverage
 *.tsbuildinfo
+playwright-report
+test-results

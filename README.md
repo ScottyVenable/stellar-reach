@@ -52,6 +52,9 @@ npm run dev          # vite dev server on http://localhost:5173
 npm run build        # production build into dist/
 npm run preview      # serve the production build
 npm run typecheck    # tsc -b in noEmit mode
+npm run lint         # eslint checks
+npm run test         # vitest unit tests
+npm run test:e2e     # playwright end-to-end tests
 ```
 
 The build produces a fully static `dist/` folder. Serve it from any
@@ -61,7 +64,17 @@ such as a GitHub Pages project site.
 
 ## Continuous integration and releases
 
-Every pull request triggers `.github/workflows/release.yml`:
+Every pull request and push to `main` now runs `.github/workflows/ci.yml`:
+
+1.  `npm ci`
+2.  `npm run lint`
+3.  `npm run typecheck`
+4.  `npm run test`
+5.  `npm run build`
+6.  `npm run test:e2e`
+
+Release packaging and pre-release publication runs in
+`.github/workflows/release.yml`:
 
 1.  `npm ci`
 2.  `npm run typecheck`

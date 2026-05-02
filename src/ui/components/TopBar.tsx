@@ -6,13 +6,13 @@ import { RACES_BY_ID } from '../../data/races';
 export function TopBar() {
   const game = useGameStore((s) => s.game);
   const setScreen = useGameStore((s) => s.setScreen);
-  if (!game) return null;
-  const station = currentStation(game);
-  const system = currentSystem(game);
+  const station = game ? currentStation(game) : undefined;
+  const system = game ? currentSystem(game) : undefined;
   const race = station ? RACES_BY_ID[station.raceId] : undefined;
 
   // Net worth = credits + cargo market value
   const netWorth = useMemo(() => {
+    if (!game) return 0;
     let total = game.player.credits;
     if (station) {
       for (const [gid, units] of Object.entries(game.player.ship.hold)) {
@@ -21,7 +21,9 @@ export function TopBar() {
       }
     }
     return total;
-  }, [game.player.credits, game.player.ship.hold, station]);
+  }, [game, station]);
+
+  if (!game) return null;
 
   return (
     <header className="topbar">
