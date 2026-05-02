@@ -11,6 +11,7 @@ import { LogScreen } from './screens/LogScreen';
 import { TripModal } from './components/TripModal';
 import { TopBar } from './components/TopBar';
 import { TabBar } from './components/TabBar';
+import { RightRail } from './components/RightRail';
 
 const SCREEN_LABELS: { id: Screen; label: string }[] = [
   { id: 'market', label: 'Market' },
@@ -36,9 +37,15 @@ export function App() {
   if (!hydrated) return null;
   if (!game) return <TitleScreen />;
 
+  // The single CSS architecture lives in global.css and uses a min-width
+  // media query at 960px. On mobile the .app element is a portrait column.
+  // On desktop it becomes a 3-column grid: left rail (vertical tabs), main
+  // column, and right rail (status summary). Both layouts render the same
+  // markup; CSS picks where each child sits.
   return (
     <div className="app">
       <TopBar />
+      <TabBar tabs={SCREEN_LABELS} />
       <main className="screen">
         {screen === 'market' && <MarketScreen />}
         {screen === 'ship' && <ShipScreen />}
@@ -48,7 +55,7 @@ export function App() {
         {screen === 'missions' && <MissionsScreen />}
         {screen === 'log' && <LogScreen />}
       </main>
-      <TabBar tabs={SCREEN_LABELS} />
+      <RightRail />
       {trip && <TripModal />}
     </div>
   );

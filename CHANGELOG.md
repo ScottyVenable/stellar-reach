@@ -27,6 +27,15 @@ Categories (omit a category if it has no entries):
   ### Internal
 -->
 
+### Features
+- Responsive desktop layout. Viewports `>= 960px` wide unfold a 16:9
+  dashboard with a vertical tab rail on the left, the active screen in
+  the center, and a live status rail on the right (credits, day, station
+  summary, ship hull / fuel / cargo). Viewports `< 960px` keep the
+  portrait stack unchanged. The break is viewport-driven, not user-agent
+  driven. Electron windows now open at 1280x720 with a 960x540 minimum,
+  and the PWA manifest no longer locks orientation to portrait. (#89)
+
 ### Improvements
 - Save files now carry a version envelope (`{ v, state }`) and migrate
   forward automatically on load. Legacy saves written by v0.1.x are detected
