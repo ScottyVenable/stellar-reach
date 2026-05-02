@@ -52,6 +52,12 @@ Categories (omit a category if it has no entries):
   by the old key and migrated seamlessly — no save lost on upgrade. (#21)
 
 ### Bug Fixes
+- Datapad redesign accessibility/layout fixes: corner-accent stripes now
+  anchor to the `.app` shell (added `position: relative`) instead of
+  drifting to the viewport corners on tablet-width layouts; `PanelHeader`
+  renders a real heading element (default `<h2>`, optional `as="h3"`)
+  so screen-reader heading navigation continues to land on each panel
+  title. (#90)
 - Replaced `Math.random()` bootstrap calls in `src/engine/rng.ts` and
   `src/engine/game.ts` with `crypto.getRandomValues()`, satisfying the
   determinism policy. The UI and engine no longer call `Math.random`
