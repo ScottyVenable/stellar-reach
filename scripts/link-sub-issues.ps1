@@ -7,7 +7,7 @@
   Run once from the repo root.
 #>
 
-$repo  = "ScottyVenable/galactic-trader"
+$repo  = "ScottyVenable/stellar-reach"
 $owner = "ScottyVenable"
 
 function New-SubIssue {
@@ -22,7 +22,9 @@ function New-SubIssue {
 
 function Connect-SubIssue {
   param([int]$parentNum, [int]$childNum)
-  $result = gh api -X POST "/repos/$repo/issues/$parentNum/sub_issues" -F "sub_issue_id=$childNum" 2>&1
+  $result = gh api -X POST "/repos/$repo/issues/$parentNum/sub_issues" `
+    -H "X-GitHub-Api-Version: 2026-03-10" `
+    -F "sub_issue_id=$childNum" 2>&1
   if ($LASTEXITCODE -ne 0) {
     Write-Warning "  Link FAILED #$childNum -> #$parentNum : $result"
   } else {

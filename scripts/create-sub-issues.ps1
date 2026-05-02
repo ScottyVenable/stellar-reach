@@ -6,7 +6,7 @@
   Run once from the repo root.
 #>
 
-$repo  = "ScottyVenable/galactic-trader"
+$repo  = "ScottyVenable/stellar-reach"
 $owner = "ScottyVenable"
 
 # Sub-issue definitions keyed by parent issue number
@@ -233,7 +233,8 @@ foreach ($parentNum in $subIssues.Keys) {
 
     # Link to parent via sub-issues API
     $linkResult = gh api -X POST "/repos/$repo/issues/$parentNum/sub_issues" `
-      -f "sub_issue_id=$childNum" 2>&1
+      -H "X-GitHub-Api-Version: 2026-03-10" `
+      -F "sub_issue_id=$childNum" 2>&1
     if ($LASTEXITCODE -ne 0) {
       Write-Warning "  Link FAILED: $linkResult"
     } else {
