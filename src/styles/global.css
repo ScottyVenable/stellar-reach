@@ -120,8 +120,8 @@
   --rail-w-wide: 240px;
   --status-w-desktop: 300px;
   --status-w-wide: 340px;
-  --hud-h: 56px;
-  --hud-h-wide: 64px;
+  --hud-h: 68px;
+  --hud-h-wide: 72px;
 
   /* Settings-driven (SettingsModal applies these on the html element). */
   --ui-font-scale: 1;
@@ -361,7 +361,7 @@ h1, h2, h3, h4 {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 6px 14px;
+  padding: 8px 14px;
   border-right: 1px solid var(--line-1);
   min-width: 0;
 }
@@ -383,6 +383,7 @@ h1, h2, h3, h4 {
   font-family: var(--font-mono);
   font-size: 14px;
   letter-spacing: 0.06em;
+  line-height: 1.25;
   color: var(--fg-0);
   white-space: nowrap;
   overflow: hidden;
@@ -396,6 +397,7 @@ h1, h2, h3, h4 {
   letter-spacing: 0.08em;
   color: var(--fg-2);
   margin-top: 2px;
+  line-height: 1.2;
   text-transform: uppercase;
 }
 
@@ -1135,6 +1137,67 @@ textarea:focus-visible {
   text-align: right;
 }
 
+.market-flow-summary,
+.helm-ship-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-1);
+}
+
+.market-flow-summary span,
+.helm-ship-summary span {
+  border: 1px solid var(--line-1);
+  background: rgba(0, 0, 0, 0.18);
+  padding: 5px 8px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.qty-control {
+  display: inline-grid;
+  grid-template-columns: 44px minmax(68px, 76px) 44px auto;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--line-2);
+  background: var(--bg-0);
+}
+
+.qty-control input[type='number'] {
+  width: 100%;
+  min-height: 44px;
+  border-top: none;
+  border-bottom: none;
+  border-left: 1px solid var(--line-1);
+  border-right: 1px solid var(--line-1);
+  border-radius: 0;
+  text-align: center;
+}
+
+.qty-step,
+.qty-max {
+  min-height: 44px;
+  border: none;
+  background: transparent;
+}
+
+.qty-step {
+  width: 44px;
+  padding: 0;
+  font-size: 15px;
+}
+
+.qty-max {
+  border-left: 1px solid var(--line-1);
+  padding: 0 10px;
+}
+
 .crew-card {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -1305,6 +1368,14 @@ textarea:focus-visible {
   text-transform: uppercase;
   color: var(--accent-amber);
   font-family: var(--font-display);
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .version-chip {
@@ -1514,6 +1585,75 @@ textarea:focus-visible {
 .starmap circle.system.selected { stroke: var(--accent-amber); }
 .starmap circle.system.current { stroke: var(--accent-cyan); }
 
+.helm-screen {
+  min-width: 0;
+}
+
+.helm-layout {
+  display: grid;
+  gap: 12px;
+}
+
+.helm-map-card,
+.helm-destinations-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.helm-map-stack {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.helm-map-stack .starmap,
+.helm-map-stack .galaxy-map {
+  flex: 1;
+  min-height: 260px;
+  max-height: min(54vh, 430px);
+}
+
+.helm-system-preview {
+  display: none;
+}
+
+.helm-destination-list {
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 2px;
+}
+
+.helm-destination {
+  width: 100%;
+  text-align: left;
+  justify-content: flex-start;
+  align-items: flex-start;
+  min-height: 64px;
+  padding: 9px 10px;
+  line-height: 1.2;
+}
+
+.helm-destination > div {
+  min-width: 0;
+}
+
+.helm-destination > div > div:first-child {
+  line-height: 1.15;
+}
+
+.helm-destination .tiny {
+  display: block;
+  margin-top: 4px;
+  line-height: 1.3;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.helm-detail-modal {
+  max-width: 560px;
+}
+
 .galaxy-map-reset {
   position: absolute;
   top: 8px;
@@ -1599,6 +1739,45 @@ textarea:focus-visible {
   .screen {
     grid-area: main;
     padding: 16px 18px 22px;
+  }
+
+  .viewport,
+  .viewport-frame {
+    min-height: 0;
+  }
+
+  .helm-layout {
+    grid-template-columns: minmax(0, 3fr) minmax(220px, 1fr);
+    height: min(620px, calc(100vh - var(--hud-h) - 132px));
+    min-height: 420px;
+  }
+
+  .helm-layout .card {
+    margin-bottom: 0;
+  }
+
+  .helm-map-stack .starmap,
+  .helm-map-stack .galaxy-map {
+    aspect-ratio: auto;
+    max-height: none;
+    min-height: 0;
+    height: 100%;
+  }
+
+  .helm-map-stack .galaxy-map:has(+ .helm-system-preview) {
+    flex: 3;
+  }
+
+  .helm-system-preview {
+    display: block;
+    flex: 1;
+    min-width: 180px;
+    margin-left: 10px;
+  }
+
+  .helm-system-preview .system-map {
+    height: 100%;
+    aspect-ratio: auto;
   }
 
   /* Vertical tab rail with console buttons. */
@@ -1722,6 +1901,10 @@ textarea:focus-visible {
   .topbar,
   .hud-strip {
     height: var(--hud-h-wide);
+  }
+
+  .helm-layout {
+    height: min(680px, calc(100vh - var(--hud-h-wide) - 156px));
   }
 
   .screen {
@@ -1949,11 +2132,12 @@ button.primary:active:not(:disabled) {
   font-size: 10.5px;
   letter-spacing: 0.04em;
   color: var(--fg-1);
-  line-height: 1.1;
+  line-height: 1.25;
+  min-height: 13px;
 }
 
 .sr-row + .sr-row {
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .sr-glyph {
@@ -2000,6 +2184,7 @@ button.primary:active:not(:disabled) {
   font-variant-numeric: tabular-nums;
   color: var(--fg-0);
   font-size: 11px;
+  line-height: 1.25;
 }
 
 .sr-val-sep {
@@ -2066,7 +2251,7 @@ button.primary:active:not(:disabled) {
 }
 
 .hud-cell.credits .hud-value {
-  font-size: 18px;
+  font-size: 17px;
   letter-spacing: 0.12em;
   color: var(--accent-amber);
   display: inline-flex;
@@ -2082,8 +2267,29 @@ button.primary:active:not(:disabled) {
 .hud-readouts {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   margin-top: 2px;
+}
+
+@media (max-width: 520px) {
+  .market-row .controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .qty-control {
+    grid-template-columns: 44px minmax(64px, 1fr) 44px 56px;
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .market-row .controls > button:not(.qty-step):not(.qty-max) {
+    width: 100%;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
 }
 
 .hud-led {

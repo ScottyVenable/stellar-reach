@@ -1,8 +1,8 @@
 {
   "currentVersion": "0.2.0-dev.0",
-  "build": 29,
+  "build": 30,
   "channel": "development",
-  "generatedAt": "2026-05-02T22:08:46.625Z",
+  "generatedAt": "2026-05-02T22:32:09.168Z",
   "releases": [
     {
       "version": "Unreleased",
@@ -24,6 +24,8 @@
           "id": "improvements",
           "label": "Improvements",
           "entries": [
+            "UI rehaul pass 3: Helm now uses a desktop 3:1 map/destination layout with matching panel heights and an overlay destination plot panel, while mobile keeps the datapad stack but opens destination details as a sheet. Market rows now include quantity steppers with hold-to-repeat acceleration alongside the number input, plus compact cargo / fuel context to reduce screen-hopping during trade. HUD credits and vessel meters have more vertical room to prevent clipped numerics and bars. (#100)",
+            "UI rehaul pass 2: AAA polish push. Panels and HUD cells gain layered surfaces with inset bezel highlights, outer drop shadows, and clip-path bevel cuts at the top-right and bottom-left corners. Buttons now have real press feedback (inset shadow + reversed gradient on `:active`). HUD vessel readouts switched from full-width progress bars to twelve-segment status meters with per-tone glow (green / amber / red / cyan). Credits use a generic-currency glyph (`U+00A4`) plus three-digit-grouped tabular numerals. Tab rail picks up an animated scanline sweep and an amber bracket on the active item. Mobile gains a pull-up status sheet for full HUD content the topbar can no longer fit, and the topbar itself becomes a 3-column grid with eyebrow + name + compact credits + ghost actions. Title screen rebuilt around a deterministic 110-star CSS starfield (seeded via `createRng`), a perspective horizon grid, an animated wordmark with tracked-out letter spacing, an arrow-clipped action stack (New Voyage / Patch Notes / Settings / Quit when running in Electron), and a footer with a channel-coloured version chip and a `SYSTEMS NOMINAL` indicator. All new motion gated behind `prefers-reduced-motion: no-preference` and the `[data-motion='reduce']` override. New `useSfx()` hook stub ready for a real audio layer. (#100)",
             "Datapad visual restyle. Sharp-cornered panels replace the previous rounded look. Two accent colours dominate: muted neon green (`#7BD389`) for confirm / active / nominal states, muted red (`#E5484D`) for warnings / close / critical. Cyan, violet, and amber are demoted to secondary accents. New `PanelHeader` component renders a monospace tag like `MARKET / FN03` with a thin status strip on every gameplay screen. Numeric readouts use a monospace face; labels use small uppercase tracked sans. Decorative diagonal-stripe accents anchor the four corners of the app shell. Reduced-motion preference respected. (#90)",
             "Save files now carry a version envelope (`{ v, state }`) and migrate forward automatically on load. Legacy saves written by v0.1.x are detected by the old key and migrated seamlessly — no save lost on upgrade. (#21)"
           ]
@@ -39,6 +41,7 @@
           "id": "bug-fixes",
           "label": "Fixes",
           "entries": [
+            "Pass-1 UI screenshot script matched tabs by `textContent === 'Market'`, but tab buttons render the label plus an `Fn` hint span, so the matcher always failed and every desktop screenshot captured the Market screen. Tabs now expose a `data-screen` attribute and the screenshot script queries that. (#100)",
             "Datapad redesign accessibility/layout fixes: corner-accent stripes now anchor to the `.app` shell (added `position: relative`) instead of drifting to the viewport corners on tablet-width layouts; `PanelHeader` renders a real heading element (default `<h2>`, optional `as=\"h3\"`) so screen-reader heading navigation continues to land on each panel title. (#90)",
             "Galaxy map scaffold now sizes correctly via shared `.galaxy-map` / `.system-map` CSS rules (mirrors `.starmap`); previously the new SVGs fell back to the 300x150 default. Markers in `GalaxyMap` and `SystemMap` are keyboard-focusable with `role=\"button\"`, descriptive `aria-label`s, and Enter/Space activation; `role=\"img\"` removed from the interactive SVGs. `MiniMap` now exposes its name to assistive tech via `<title>` + `aria-labelledby` on the `<svg>` itself. (Refs #91)",
             "Replaced `Math.random()` bootstrap calls in `src/engine/rng.ts` and `src/engine/game.ts` with `crypto.getRandomValues()`, satisfying the determinism policy. The UI and engine no longer call `Math.random` anywhere. (#22)"

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useGameStore } from '../../state/store';
 import { allStations, currentStation, currentSystem } from '../../engine/game';
 import { estimateRoute } from '../../engine/game';
@@ -15,6 +15,11 @@ const BUY_OPPORTUNITY_THRESHOLD = 0.1;
 /** Maximum number of trade hints shown for a destination. */
 const MAX_TRADE_HINTS = 4;
 
+const ROUTE_OPTIONS: { id: SafetyChoice; label: string }[] = [
+  { id: 'safe', label: 'Safe Route' },
+  { id: 'fast', label: 'Fast Route' },
+];
+
 export function HelmScreen() {
   const game = useGameStore((s) => s.game)!;
   const beginTrip = useGameStore((s) => s.beginTrip);
@@ -22,6 +27,8 @@ export function HelmScreen() {
 
   const [selected, setSelected] = useState<string | null>(null);
   const [safety, setSafety] = useState<SafetyChoice>('safe');
+  const [detailOpen, setDetailOpen] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const station = currentStation(game);
   const system = currentSystem(game);
@@ -32,6 +39,16 @@ export function HelmScreen() {
   const targetSys = target ? game.galaxy.systems.find((sys) => sys.stations.some((st) => st.id === target.id)) : undefined;
   const route = useMemo(() => (target ? estimateRoute(game, target.id, safety) : null), [game, target, safety]);
   const canTravel = !!route && game.player.ship.fuel >= route.fuelCost;
+
+  useEffect(() => {
+    if (!detailOpen) return;
+    closeButtonRef.current?.focus();
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setDetailOpen(false);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [detailOpen]);
 
   // Top trade opportunities: goods in hold that sell higher at target, or cheap buys at target
   const tradeHints = useMemo(() => {
@@ -66,25 +83,39 @@ export function HelmScreen() {
     return hints.sort((a, b) => b.delta - a.delta).slice(0, MAX_TRADE_HINTS);
   }, [target, station, game.player.ship.hold]);
 
+  function openDestination(stationId: string | null | undefined) {
+    if (!stationId) return;
+    setSelected(stationId);
+    setDetailOpen(true);
+  }
+
+  function engageDrive() {
+    if (!target || !canTravel) return;
+    setDetailOpen(false);
+    beginTrip(target.id, safety);
+  }
+
   return (
-    <div>
-      <div className="card">
+    <div className="helm-screen">
+      <div className="helm-layout">
+      <div className="card helm-map-card">
         <PanelHeader tag="STARMAP" code="FN04" status="ok" rightSlot={`${game.galaxy.systems.length} SYS`} />
-        {galaxyMapEnabled ? (
-          <>
+        <div className="helm-map-stack">
+          {galaxyMapEnabled ? (
+            <>
             <GalaxyMap
               galaxy={game.galaxy}
               currentSystemId={system?.id}
               selectedSystemId={targetSys?.id}
-              onSelectSystem={(sys) => setSelected(sys.stations[0]?.id ?? null)}
+              onSelectSystem={(sys) => openDestination(sys.stations[0]?.id)}
             />
             {targetSys && (
-              <div style={{ marginTop: 12 }}>
+              <div className="helm-system-preview">
                 <SystemMap
                   system={targetSys}
                   currentStationId={station?.id}
                   selectedStationId={selected ?? undefined}
-                  onSelectStation={(st) => setSelected(st.id)}
+                  onSelectStation={(st) => openDestination(st.id)}
                 />
               </div>
             )}
@@ -96,7 +127,18 @@ export function HelmScreen() {
               const isCurrent = sys.id === system?.id;
               const isSelected = target && targetSys?.id === sys.id;
               return (
-                <g key={sys.id}>
+                <g
+                  key={sys.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Open destinations in ${sys.name}`}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      openDestination(sys.stations[0]?.id);
+                    }
+                  }}
+                >
                   <circle
                     className={`system ${isCurrent ? 'current' : ''} ${isSelected ? 'selected' : ''}`}
                     cx={sys.x}
@@ -107,7 +149,7 @@ export function HelmScreen() {
                     strokeWidth={2}
                     onClick={() => {
                       // Pick the first station of the selected system by default.
-                      setSelected(sys.stations[0]?.id ?? null);
+                      openDestination(sys.stations[0]?.id);
                     }}
                   />
                   <text
@@ -126,11 +168,17 @@ export function HelmScreen() {
           </svg>
           </div>
         )}
+        </div>
       </div>
 
-      <div className="card">
+      <div className="card helm-destinations-card">
         <PanelHeader tag="DESTINATIONS" code="FN04A" status="ok" />
-        <div className="list">
+        <div className="helm-ship-summary" aria-label="Current vessel travel summary">
+          <span>{station?.name ?? 'Unknown'}</span>
+          <span>Fuel {game.player.ship.fuel}/{game.player.ship.fuelMax}</span>
+          <span>Cargo {game.player.ship.cargo}/{game.player.ship.cargoMax}</span>
+        </div>
+        <div className="list helm-destination-list">
           {stations.map((s) => {
             const sys = game.galaxy.systems.find((y) => y.stations.some((st) => st.id === s.id));
             const race = RACES_BY_ID[s.raceId];
@@ -138,9 +186,9 @@ export function HelmScreen() {
             return (
               <button
                 key={s.id}
-                className={`row spread ${isSel ? 'primary' : 'muted'}`}
-                onClick={() => setSelected(s.id)}
-                style={{ textAlign: 'left' }}
+                className={`row spread helm-destination ${isSel ? 'primary' : 'muted'}`}
+                onClick={() => openDestination(s.id)}
+                aria-haspopup="dialog"
               >
                 <div>
                   <div>{s.name}</div>
@@ -153,17 +201,50 @@ export function HelmScreen() {
           })}
         </div>
       </div>
+      </div>
 
-      {target && route && (
-        <div className="card">
-          <PanelHeader tag="PLOT" code="FN04B" status={canTravel ? 'ok' : 'warn'} />
+      {detailOpen && target && route && (
+        <div
+          className="modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setDetailOpen(false);
+          }}
+        >
+        <div
+          className="modal helm-detail-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="helm-detail-title"
+        >
+          <div className="modal-title-row">
+            <div>
+              <div className="tiny">PLOT / FN04B</div>
+              <h2 id="helm-detail-title">{target.name}</h2>
+            </div>
+            <button
+              type="button"
+              className="ghost icon-only"
+              onClick={() => setDetailOpen(false)}
+              aria-label="Close destination details"
+              ref={closeButtonRef}
+            >
+              X
+            </button>
+          </div>
+          <div className="tiny" style={{ marginBottom: 10 }}>
+            {targetSys?.name} | {targetSys?.region} | {target.kind} | {RACES_BY_ID[target.raceId]?.adjective}
+          </div>
           <div className="row" style={{ marginBottom: 8 }}>
-            <button className={`chip ${safety === 'safe' ? 'active' : ''}`} onClick={() => setSafety('safe')}>
-              Safe Route
-            </button>
-            <button className={`chip ${safety === 'fast' ? 'active' : ''}`} onClick={() => setSafety('fast')}>
-              Fast Route
-            </button>
+            {ROUTE_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                className={`chip ${safety === option.id ? 'active' : ''}`}
+                onClick={() => setSafety(option.id)}
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
           <div className="kv">
             <span className="k">Distance</span>
@@ -174,6 +255,8 @@ export function HelmScreen() {
             <span className="v">{route.fuelCost} / {game.player.ship.fuel}</span>
             <span className="k">Events</span>
             <span className="v">{route.eventCount}</span>
+            <span className="k">Hold</span>
+            <span className="v">{game.player.ship.cargo}/{game.player.ship.cargoMax}</span>
           </div>
           {tradeHints.length > 0 && (
             <div style={{ marginTop: 10 }}>
@@ -193,10 +276,11 @@ export function HelmScreen() {
             className="primary"
             style={{ marginTop: 10, width: '100%' }}
             disabled={!canTravel}
-            onClick={() => beginTrip(target.id, safety)}
+            onClick={engageDrive}
           >
             Engage Drive
           </button>
+        </div>
         </div>
       )}
     </div>

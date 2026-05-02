@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useGameStore } from '../../state/store';
 import { currentStation, priceMultipliers } from '../../engine/game';
 import { GOODS_BY_ID } from '../../data/goods';
@@ -23,6 +23,109 @@ const CATEGORIES: ('All' | GoodCategory)[] = [
 
 /** Percentage deviation from galactic base price below which the trend is shown as neutral. */
 const PRICE_TREND_THRESHOLD = 3;
+const HOLD_START_DELAY_MS = 320;
+const HOLD_MIN_DELAY_MS = 55;
+const HOLD_ACCELERATION = 0.78;
+
+function useRepeatingPress(onStep: () => void) {
+  const onStepRef = useRef(onStep);
+  const timerRef = useRef<number | null>(null);
+  const delayRef = useRef(HOLD_START_DELAY_MS);
+
+  useEffect(() => {
+    onStepRef.current = onStep;
+  }, [onStep]);
+
+  const stop = useCallback(() => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    delayRef.current = HOLD_START_DELAY_MS;
+  }, []);
+
+  const schedule = useCallback(() => {
+    timerRef.current = window.setTimeout(() => {
+      onStepRef.current();
+      delayRef.current = Math.max(HOLD_MIN_DELAY_MS, delayRef.current * HOLD_ACCELERATION);
+      schedule();
+    }, delayRef.current);
+  }, []);
+
+  const start = useCallback(() => {
+    stop();
+    schedule();
+  }, [schedule, stop]);
+
+  useEffect(() => stop, [stop]);
+
+  return { start, stop };
+}
+
+interface QuantityControlProps {
+  label: string;
+  value: number;
+  max: number;
+  onChange(value: number): void;
+}
+
+function QuantityControl({ label, value, max, onChange }: QuantityControlProps) {
+  const clamp = useCallback((next: number) => Math.max(1, Math.min(max, Math.floor(next || 1))), [max]);
+  const stepDown = useCallback(() => onChange(clamp(value - 1)), [clamp, onChange, value]);
+  const stepUp = useCallback(() => onChange(clamp(value + 1)), [clamp, onChange, value]);
+  const decPress = useRepeatingPress(stepDown);
+  const incPress = useRepeatingPress(stepUp);
+
+  return (
+    <div className="qty-control" aria-label={label}>
+      <HoldButton label="Decrease units" onClick={stepDown} hold={decPress}>-</HoldButton>
+      <input
+        type="number"
+        min={1}
+        max={max}
+        value={value}
+        onChange={(ev) => onChange(clamp(Number(ev.target.value)))}
+        inputMode="numeric"
+        aria-label={label}
+      />
+      <HoldButton label="Increase units" onClick={stepUp} hold={incPress}>+</HoldButton>
+      <button type="button" className="tiny qty-max" onClick={() => onChange(max)} disabled={max <= 1}>
+        Max
+      </button>
+    </div>
+  );
+}
+
+function HoldButton({
+  children,
+  label,
+  onClick,
+  hold,
+}: {
+  children: string;
+  label: string;
+  onClick(): void;
+  hold: ReturnType<typeof useRepeatingPress>;
+}) {
+  return (
+    <button
+      type="button"
+      className="qty-step"
+      onClick={onClick}
+      onPointerDown={(event) => {
+        if (event.button !== 0) return;
+        hold.start();
+      }}
+      onPointerUp={hold.stop}
+      onPointerCancel={hold.stop}
+      onPointerLeave={hold.stop}
+      onBlur={hold.stop}
+      aria-label={label}
+    >
+      {children}
+    </button>
+  );
+}
 
 export function MarketScreen() {
   const game = useGameStore((s) => s.game)!;
@@ -45,6 +148,7 @@ export function MarketScreen() {
 
   const ship = game.player.ship;
   const freeCargoUnits = (slot: number) => Math.floor((ship.cargoMax - ship.cargo) / slot);
+  const cargoFree = Math.max(0, ship.cargoMax - ship.cargo);
 
   return (
     <div>
@@ -55,6 +159,11 @@ export function MarketScreen() {
           status="ok"
           rightSlot={`BUY x${muls.buy.toFixed(2)} / SELL x${muls.sell.toFixed(2)}`}
         />
+        <div className="market-flow-summary" aria-label="Current trade status">
+          <span>{station.name}</span>
+          <span>Cargo {ship.cargo}/{ship.cargoMax} ({cargoFree} free)</span>
+          <span>Fuel {ship.fuel}/{ship.fuelMax}</span>
+        </div>
         <div className="scroll-x" role="tablist" aria-label="Category filter">
           {CATEGORIES.map((c) => (
             <button
@@ -93,6 +202,7 @@ export function MarketScreen() {
             e.supply,
           );
           const maxSell = Math.min(have, e.demand);
+          const quantityMax = Math.max(1, Math.max(maxBuy, maxSell, u));
 
           return (
             <div className="market-row" key={e.goodId}>
@@ -115,14 +225,11 @@ export function MarketScreen() {
                 <div className="tiny">sell {sellPrice}</div>
               </div>
               <div className="controls">
-                <input
-                  type="number"
-                  min={1}
-                  max={999}
+                <QuantityControl
+                  label={`Units of ${good.name}`}
                   value={u}
-                  onChange={(ev) => setU(e.goodId, Number(ev.target.value))}
-                  inputMode="numeric"
-                  aria-label={`Units of ${good.name}`}
+                  max={quantityMax}
+                  onChange={(next) => setU(e.goodId, next)}
                 />
                 <button onClick={() => buy(e.goodId, u)} disabled={e.supply <= 0 || maxBuy <= 0}>
                   Buy
