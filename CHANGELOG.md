@@ -28,6 +28,22 @@ Categories (omit a category if it has no entries):
 -->
 
 ### Features
+- UI overhaul: bridge-console identity. Self-hosted typography pairing
+  (Chakra Petch for HUD chrome and headings, Space Grotesk for body
+  copy, JetBrains Mono for numerics and labels). Desktop adopts a full
+  HUD strip across the top with stardate, callsign, hull / fuel / cargo
+  bars, credits, and net worth; the left tab rail becomes vertical
+  console buttons with iconography and `Fn` hotkey hints; the right rail
+  picks up a live news ticker and trade-hold readout. Mobile keeps its
+  portrait stack but gains the same icon set on the bottom bar and a
+  contextual breadcrumb on every screen. Each active screen now renders
+  inside a thin "viewport" frame with corner brackets, fading in on
+  navigation (or instantly under reduced motion). (#100)
+- Settings modal. New gear button in the HUD opens a Settings dialog
+  with three controls: font scale (Small / Standard / Large / XL),
+  density (Comfortable / Compact), and motion (System / Reduce / Full).
+  Persisted to `localStorage` independently of the game save, so they
+  survive new game and reset. (#100)
 - Responsive desktop layout. Viewports `>= 960px` wide unfold a 16:9
   dashboard with a vertical tab rail on the left, the active screen in
   the center, and a live status rail on the right (credits, day, station
@@ -37,6 +53,33 @@ Categories (omit a category if it has no entries):
   and the PWA manifest no longer locks orientation to portrait. (#89)
 
 ### Improvements
+- UI overhaul pass 3: Helm now uses a desktop 3:1 map/destination layout
+  with matching panel heights and an overlay destination plot panel, while
+  mobile keeps the datapad stack but opens destination details as a sheet.
+  Market rows now include quantity steppers with hold-to-repeat acceleration
+  alongside the number input, plus compact cargo / fuel context to reduce
+  screen-hopping during trade. HUD credits and vessel meters have more
+  vertical room to prevent clipped numerics and bars. (#100)
+- UI overhaul pass 2: AAA polish push. Panels and HUD cells gain layered
+  surfaces with inset bezel highlights, outer drop shadows, and clip-path
+  bevel cuts at the top-right and bottom-left corners. Buttons now have
+  real press feedback (inset shadow + reversed gradient on `:active`).
+  HUD vessel readouts switched from full-width progress bars to
+  twelve-segment status meters with per-tone glow (green / amber / red
+  / cyan). Credits use a generic-currency glyph (`U+00A4`) plus
+  three-digit-grouped tabular numerals. Tab rail picks up an animated
+  scanline sweep and an amber bracket on the active item. Mobile gains a
+  pull-up status sheet for full HUD content the topbar can no longer
+  fit, and the topbar itself becomes a 3-column grid with eyebrow + name
+  + compact credits + ghost actions. Title screen rebuilt around a
+  deterministic 110-star CSS starfield (seeded via `createRng`), a
+  perspective horizon grid, an animated wordmark with tracked-out letter
+  spacing, an arrow-clipped action stack (New Voyage / Patch Notes /
+  Settings / Quit when running in Electron), and a footer with a
+  channel-coloured version chip and a `SYSTEMS NOMINAL` indicator.
+  All new motion gated behind `prefers-reduced-motion: no-preference`
+  and the `[data-motion='reduce']` override. New `useSfx()` hook stub
+  ready for a real audio layer. (#100)
 - Datapad visual restyle. Sharp-cornered panels replace the previous
   rounded look. Two accent colours dominate: muted neon green
   (`#7BD389`) for confirm / active / nominal states, muted red
@@ -59,6 +102,11 @@ Categories (omit a category if it has no entries):
   Full implementation lands across three sub-issues of #91. (Refs #91)
 
 ### Bug Fixes
+- Pass-1 UI screenshot script matched tabs by `textContent === 'Market'`,
+  but tab buttons render the label plus an `Fn` hint span, so the matcher
+  always failed and every desktop screenshot captured the Market screen.
+  Tabs now expose a `data-screen` attribute and the screenshot script
+  queries that. (#100)
 - Datapad redesign accessibility/layout fixes: corner-accent stripes now
   anchor to the `.app` shell (added `position: relative`) instead of
   drifting to the viewport corners on tablet-width layouts; `PanelHeader`

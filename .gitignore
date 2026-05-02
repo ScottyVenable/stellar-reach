@@ -19,5 +19,12 @@ coverage
 ../internal-dev-docs/
 internal-dev-docs/
 
-# Screenshot evidence captured by Sol and Rook during PR review — not committed.
-screenshots/
+# Screenshot evidence captured by Sol and Rook during PR review — not committed
+# by default. PR-embed attachment subfolders are explicitly allowed so the
+# images referenced from PR descriptions resolve from the repo. We use
+# `screenshots/*` (not `screenshots/`) so the negation can re-include
+# specific subdirectories — git cannot re-include a file under an
+# entirely-excluded parent directory.
+screenshots/*
+!screenshots/pr-*-attachments/
+!screenshots/pr-*-attachments/**

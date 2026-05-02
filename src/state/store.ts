@@ -10,6 +10,69 @@ import { createRng } from '../engine/rng';
 
 export type Screen = 'market' | 'ship' | 'crew' | 'helm' | 'news' | 'missions' | 'log';
 
+/* Settings (UI-only, persisted separately from the game save) ----------- */
+
+export type FontScale = 0.9 | 1 | 1.1 | 1.25;
+export type Density = 'comfortable' | 'compact';
+export type MotionPref = 'system' | 'reduce' | 'full';
+
+export interface UISettings {
+  fontScale: FontScale;
+  density: Density;
+  motion: MotionPref;
+}
+
+export const FONT_SCALE_OPTIONS: { value: FontScale; label: string }[] = [
+  { value: 0.9, label: 'Small' },
+  { value: 1, label: 'Standard' },
+  { value: 1.1, label: 'Large' },
+  { value: 1.25, label: 'XL' },
+];
+export const DENSITY_OPTIONS: { value: Density; label: string }[] = [
+  { value: 'comfortable', label: 'Comfortable' },
+  { value: 'compact', label: 'Compact' },
+];
+export const MOTION_OPTIONS: { value: MotionPref; label: string }[] = [
+  { value: 'system', label: 'System' },
+  { value: 'reduce', label: 'Reduce' },
+  { value: 'full', label: 'Full' },
+];
+
+const SETTINGS_KEY = 'stellar-reach-settings-v1';
+const DEFAULT_SETTINGS: UISettings = {
+  fontScale: 1,
+  density: 'comfortable',
+  motion: 'system',
+};
+
+function loadSettings(): UISettings {
+  if (typeof localStorage === 'undefined') return DEFAULT_SETTINGS;
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return DEFAULT_SETTINGS;
+    const parsed = JSON.parse(raw) as Partial<UISettings>;
+    return {
+      fontScale: (FONT_SCALE_OPTIONS.find((o) => o.value === parsed.fontScale)?.value
+        ?? DEFAULT_SETTINGS.fontScale) as FontScale,
+      density: (DENSITY_OPTIONS.find((o) => o.value === parsed.density)?.value
+        ?? DEFAULT_SETTINGS.density) as Density,
+      motion: (MOTION_OPTIONS.find((o) => o.value === parsed.motion)?.value
+        ?? DEFAULT_SETTINGS.motion) as MotionPref,
+    };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
+function saveSettings(s: UISettings): void {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
+  } catch {
+    /* quota or denied; settings simply won't persist */
+  }
+}
+
 export interface PendingTrip {
   toStationId: string;
   safety: RouteSafety;
@@ -38,8 +101,11 @@ interface AppState {
     /** Render the new SVG GalaxyMap / SystemMap / MiniMap (parent #91). */
     galaxyMap: boolean;
   };
+  /** UI-only settings persisted to localStorage independently of the save. */
+  settings: UISettings;
   setScreen(s: Screen): void;
   setFlag(name: keyof AppState['flags'], value: boolean): void;
+  setSetting<K extends keyof UISettings>(key: K, value: UISettings[K]): void;
 
   // Lifecycle
   startNewGame(seed?: string, captainName?: string): void;
@@ -73,9 +139,16 @@ export const useGameStore = create<AppState>((set, get) => ({
   flags: {
     galaxyMap: false,
   },
+  settings: loadSettings(),
   setScreen: (s) => set({ screen: s }),
   setFlag: (name, value) =>
     set((s) => ({ flags: { ...s.flags, [name]: value } })),
+  setSetting: (key, value) =>
+    set((s) => {
+      const next = { ...s.settings, [key]: value };
+      saveSettings(next);
+      return { settings: next };
+    }),
 
   startNewGame: (seed, captainName) => {
     const g = newGame({ seed, captainName });

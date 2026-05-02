@@ -1,12 +1,16 @@
 import { useGameStore } from '../../state/store';
 import { currentStation, currentSystem } from '../../engine/game';
 import { RACES_BY_ID } from '../../data/races';
+import { GOODS_BY_ID } from '../../data/goods';
+import { PanelHeader } from './PanelHeader';
 
 /**
- * Right-rail summary panel rendered on desktop layouts (>= 960px viewports).
- * Shows the same vital signs that the TopBar shows on mobile, in a denser
- * stacked form. The TopBar hides this content on desktop so the data is not
- * duplicated.
+ * Right-rail status panel rendered on desktop layouts (>= 960px). The
+ * HudStrip up top covers credits / hull / fuel / cargo, so this rail is
+ * free to focus on:
+ *   - Callsign block (current station + system + race)
+ *   - News ticker (last few headlines, latest first)
+ *   - Trade hold contents (top items)
  */
 export function RightRail() {
   const game = useGameStore((s) => s.game);
@@ -16,81 +20,73 @@ export function RightRail() {
   const race = station ? RACES_BY_ID[station.raceId] : undefined;
   const ship = game.player.ship;
 
-  const hullPct = ship.hullMax > 0 ? Math.round((ship.hull / ship.hullMax) * 100) : 0;
-  const fuelPct = ship.fuelMax > 0 ? Math.round((ship.fuel / ship.fuelMax) * 100) : 0;
-  const cargoPct = ship.cargoMax > 0 ? Math.round((ship.cargo / ship.cargoMax) * 100) : 0;
+  // Surface up to 4 most recent news items, newest first. If the news log
+  // is empty we hide the panel entirely rather than showing an empty box.
+  const news = [...game.news].sort((a, b) => b.day - a.day).slice(0, 4);
+
+  // Top hold items by units, capped at 4. Cargo hold is a Record<id, units>
+  // so we sort by value.
+  const hold = Object.entries(ship.hold)
+    .filter(([, units]) => units > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
 
   return (
     <aside className="rightrail" aria-label="Status summary">
       <div className="card">
-        <h3>Status</h3>
-        <div className="kv">
-          <span className="k">Day</span>
-          <span className="v">{String(game.player.day).padStart(3, '0')}</span>
-          <span className="k">Credits</span>
-          <span className="v amber">{game.player.credits.toLocaleString()}</span>
-        </div>
-      </div>
-
-      <div className="card">
-        <h3>Station</h3>
+        <PanelHeader tag="CALLSIGN" code="FN01" status="ok" />
         <div className="rightrail-name cyan">{station?.name ?? 'Unknown'}</div>
-        <div className="tiny" style={{ marginTop: 2 }}>
-          {system?.name} | {system?.region}
+        <div className="tiny" style={{ marginTop: 4 }}>
+          {system?.name} · {system?.region}
         </div>
         <div className="tiny" style={{ marginTop: 2 }}>
-          {station?.kind} | {race?.adjective}
+          {station?.kind} · {race?.adjective ?? '—'}
         </div>
       </div>
 
-      <div className="card">
-        <h3>Ship</h3>
-        <div className="kv">
-          <span className="k">Hull</span>
-          <span className="v">{ship.hull}/{ship.hullMax}</span>
+      {hold.length > 0 ? (
+        <div className="card">
+          <PanelHeader
+            tag="HOLD"
+            code="FN02"
+            status="ok"
+            rightSlot={`${ship.cargo}/${ship.cargoMax}`}
+          />
+          <div className="kv">
+            {hold.map(([gid, units]) => (
+              <RowItem
+                key={gid}
+                k={GOODS_BY_ID[gid]?.name ?? gid}
+                v={String(units)}
+              />
+            ))}
+          </div>
         </div>
-        <div
-          className="bar"
-          role="progressbar"
-          aria-label="Hull"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={hullPct}
-          aria-valuetext={`${ship.hull} of ${ship.hullMax}`}
-        >
-          <div style={{ width: `${hullPct}%` }} />
+      ) : null}
+
+      {news.length > 0 ? (
+        <div className="card">
+          <PanelHeader tag="WIRE" code="FN05" status="ok" />
+          <div className="rail-news">
+            {news.map((n) => (
+              <div key={n.id} className="rail-news-item">
+                <div>{n.headline}</div>
+                <div className="meta">D{String(n.day).padStart(3, '0')}</div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="kv" style={{ marginTop: 6 }}>
-          <span className="k">Fuel</span>
-          <span className="v">{ship.fuel}/{ship.fuelMax}</span>
-        </div>
-        <div
-          className="bar"
-          role="progressbar"
-          aria-label="Fuel"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={fuelPct}
-          aria-valuetext={`${ship.fuel} of ${ship.fuelMax}`}
-        >
-          <div style={{ width: `${fuelPct}%` }} />
-        </div>
-        <div className="kv" style={{ marginTop: 6 }}>
-          <span className="k">Cargo</span>
-          <span className="v">{ship.cargo}/{ship.cargoMax}</span>
-        </div>
-        <div
-          className="bar"
-          role="progressbar"
-          aria-label="Cargo"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={cargoPct}
-          aria-valuetext={`${ship.cargo} of ${ship.cargoMax}`}
-        >
-          <div style={{ width: `${cargoPct}%` }} />
-        </div>
-      </div>
+      ) : null}
     </aside>
+  );
+}
+
+/** Tiny wrapper so the kv markup stays in one place. */
+function RowItem({ k, v }: { k: string; v: string }) {
+  return (
+    <>
+      <span className="k">{k}</span>
+      <span className="v">{v}</span>
+    </>
   );
 }
