@@ -19,8 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add to Galactic Trader project
-        uses: actions/add-to-project@v1
+        uses: actions/add-to-project@v1.0.2
         with:
-          project-url: https://github.com/users/ScottyVenable/projects/1
+          project-url: https://github.com/users/ScottyVenable/projects/8
           github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
