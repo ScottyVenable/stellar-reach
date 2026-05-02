@@ -20,6 +20,9 @@ const CATEGORIES: ('All' | GoodCategory)[] = [
   'Cultural',
 ];
 
+/** Percentage deviation from galactic base price below which the trend is shown as neutral. */
+const PRICE_TREND_THRESHOLD = 3;
+
 export function MarketScreen() {
   const game = useGameStore((s) => s.game)!;
   const buy = useGameStore((s) => s.buy);
@@ -38,6 +41,9 @@ export function MarketScreen() {
   });
 
   const setU = (id: string, v: number) => setUnits((u) => ({ ...u, [id]: Math.max(1, Math.floor(v || 1)) }));
+
+  const ship = game.player.ship;
+  const freeCargoUnits = (slot: number) => Math.floor((ship.cargoMax - ship.cargo) / slot);
 
   return (
     <div>
@@ -68,16 +74,33 @@ export function MarketScreen() {
         {filtered.map((e) => {
           const good = GOODS_BY_ID[e.goodId];
           if (!good) return null;
-          const have = game.player.ship.hold[e.goodId] ?? 0;
+          const have = ship.hold[e.goodId] ?? 0;
           const buyPrice = Math.max(1, Math.round(e.price * muls.buy));
           const sellPrice = Math.max(1, Math.round(e.price * muls.sell));
           const u = units[e.goodId] ?? 1;
+
+          // Price trend vs galactic base price
+          const delta = e.price - good.basePrice;
+          const pct = good.basePrice > 0 ? (delta / good.basePrice) * 100 : 0;
+          const trendLabel = Math.abs(pct) < PRICE_TREND_THRESHOLD ? '=' : pct > 0 ? `▲${Math.abs(pct).toFixed(0)}%` : `▼${Math.abs(pct).toFixed(0)}%`;
+          const trendClass = Math.abs(pct) < PRICE_TREND_THRESHOLD ? 'muted' : pct > 0 ? 'amber' : 'cyan';
+
+          // Max amounts for convenience buttons
+          const maxBuy = Math.min(
+            Math.floor(game.player.credits / Math.max(1, buyPrice)),
+            freeCargoUnits(good.bulk),
+            e.supply,
+          );
+          const maxSell = Math.min(have, e.demand);
+
           return (
             <div className="market-row" key={e.goodId}>
               <div>
                 <div className="name">
                   {good.name}{' '}
                   <span className={`tag ${good.legality}`}>{good.legality}</span>
+                  {' '}
+                  <span className={`tiny ${trendClass}`}>{trendLabel}</span>
                 </div>
                 <div className="meta">
                   {good.category} | bulk {good.bulk} |{' '}
@@ -100,12 +123,30 @@ export function MarketScreen() {
                   inputMode="numeric"
                   aria-label={`Units of ${good.name}`}
                 />
-                <button onClick={() => buy(e.goodId, u)} disabled={e.supply <= 0}>
+                <button onClick={() => buy(e.goodId, u)} disabled={e.supply <= 0 || maxBuy <= 0}>
                   Buy
+                </button>
+                <button
+                  className="tiny"
+                  onClick={() => { if (maxBuy > 0) buy(e.goodId, maxBuy); }}
+                  disabled={maxBuy <= 0}
+                  title={`Buy max affordable (${maxBuy})`}
+                >
+                  Max
                 </button>
                 <button onClick={() => sell(e.goodId, u)} disabled={have <= 0 || e.demand <= 0}>
                   Sell
                 </button>
+                {have > 0 && (
+                  <button
+                    className="tiny"
+                    onClick={() => { if (maxSell > 0) sell(e.goodId, maxSell); }}
+                    disabled={maxSell <= 0}
+                    title={`Sell all (${maxSell})`}
+                  >
+                    All
+                  </button>
+                )}
               </div>
             </div>
           );

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useGameStore } from '../../state/store';
 import { currentStation, currentSystem } from '../../engine/game';
 import { RACES_BY_ID } from '../../data/races';
@@ -9,6 +10,18 @@ export function TopBar() {
   const station = currentStation(game);
   const system = currentSystem(game);
   const race = station ? RACES_BY_ID[station.raceId] : undefined;
+
+  // Net worth = credits + cargo market value
+  const netWorth = useMemo(() => {
+    let total = game.player.credits;
+    if (station) {
+      for (const [gid, units] of Object.entries(game.player.ship.hold)) {
+        const e = station.market.find((m) => m.goodId === gid);
+        if (e) total += e.price * units;
+      }
+    }
+    return total;
+  }, [game.player.credits, game.player.ship.hold, station]);
 
   return (
     <header className="topbar">
@@ -28,6 +41,9 @@ export function TopBar() {
         <div className="credits">
           <span className="label">CR</span>
           {game.player.credits.toLocaleString()}
+        </div>
+        <div className="tiny muted" style={{ textAlign: 'right' }}>
+          NET {netWorth.toLocaleString()}
         </div>
       </div>
     </header>

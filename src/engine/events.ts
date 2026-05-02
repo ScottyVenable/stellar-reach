@@ -150,6 +150,102 @@ export const TRANSIT_EVENTS: TransitEvent[] = [
       },
     ],
   },
+  {
+    id: 'nebula-storm',
+    title: 'Nebula ion storm',
+    description:
+      'A sudden ion storm rolls off the nearby nebula, saturating your shields with charge and threatening critical systems.',
+    choices: [
+      {
+        id: 'engineer',
+        label: 'Purge shield capacitors to bleed the charge',
+        testRole: 'Engineer',
+        dc: 12,
+        success: { text: 'A clean purge. The storm passes and systems stabilise.', shieldDelta: -10, stressDelta: 4 },
+        failure: { text: 'The backflow fries a relay. Hull integrity suffers.', shieldDelta: -20, hullDelta: -10, stressDelta: 10 },
+      },
+      {
+        id: 'pilot',
+        label: 'Punch through the storm at full burn',
+        testRole: 'Pilot',
+        dc: 13,
+        success: { text: 'You claw through. Fuel burns hot but the ship holds.', fuelDelta: -8, stressDelta: 6 },
+        failure: { text: 'The storm bucks the hull and you lose nav control briefly. Sparks everywhere.', hullDelta: -14, stressDelta: 12 },
+      },
+      {
+        id: 'drift',
+        label: 'Drop to minimal power and drift through',
+        testRole: null,
+        dc: 0,
+        success: { text: 'The storm sweeps past. Slow but safe — mostly.', shieldDelta: -5, stressDelta: 2 },
+        failure: { text: '' },
+      },
+    ],
+  },
+  {
+    id: 'trader-convoy',
+    title: 'Merchant convoy hail',
+    description:
+      'A heavily laden merchant convoy broadcasts an open channel, asking if you want to trade surplus cargo at reduced prices.',
+    choices: [
+      {
+        id: 'negotiator',
+        label: 'Negotiate a bulk purchase',
+        testRole: 'Negotiator',
+        dc: 11,
+        success: { text: 'You barter hard and offload some goods at a tidy margin.', creditsDelta: 600, stressDelta: 2 },
+        failure: { text: 'The convoy captain drives a hard bargain — you walk away with nothing but pleasantries.', stressDelta: 2 },
+      },
+      {
+        id: 'scan',
+        label: 'Run a passive sensor scan before responding',
+        testRole: 'Scientist',
+        dc: 12,
+        success: { text: 'Your scan reveals hidden cargo bays packed with contraband — you report them for a bounty.', creditsDelta: 800, stressDelta: 4 },
+        failure: { text: 'Your scan is detected. The convoy accelerates away before you can hail.', stressDelta: 3 },
+      },
+      {
+        id: 'wave',
+        label: 'Wave them off and continue',
+        testRole: null,
+        dc: 0,
+        success: { text: 'You log the encounter and proceed on course.' },
+        failure: { text: '' },
+      },
+    ],
+  },
+  {
+    id: 'distress-beacon',
+    title: 'Distress beacon',
+    description:
+      'An automated distress beacon pulses from a nearby moon. Someone — or something — is in trouble down there.',
+    choices: [
+      {
+        id: 'medic',
+        label: 'Dispatch the Medic in a drop shuttle',
+        testRole: 'Medic',
+        dc: 12,
+        success: { text: 'Your Medic stabilises the survivors. They reward you with rare biological samples.', cargoDelta: [{ goodId: 'biosamples', units: 3 }], stressDelta: 6 },
+        failure: { text: 'The shuttle is ambushed — it limps back with hull scoring and a shaken crew.', hullDelta: -8, stressDelta: 14 },
+      },
+      {
+        id: 'pilot',
+        label: 'Swoop in fast and grab whoever is there',
+        testRole: 'Pilot',
+        dc: 13,
+        success: { text: 'Lightning extraction. The survivor turns out to be a fugitive scientist who pays handsomely for safe passage.', creditsDelta: 900, stressDelta: 8 },
+        failure: { text: 'The landing strut clips a rock. Minor hull damage but the shuttle returns empty.', hullDelta: -6, stressDelta: 8 },
+      },
+      {
+        id: 'ignore',
+        label: 'Log the beacon and report it at the next station',
+        testRole: null,
+        dc: 0,
+        success: { text: 'You file the report. Authorities say they will investigate. Probably.', stressDelta: 3 },
+        failure: { text: '' },
+      },
+    ],
+  },
 ];
 
 export function pickTransitEvents(rng: Rng, count: number): TransitEvent[] {
