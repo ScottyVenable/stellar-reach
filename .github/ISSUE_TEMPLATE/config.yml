@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discussion / open-ended question
+    url: https://github.com/ScottyVenable/galactic-trader/discussions
+    about: For design conversations, ideas, polls, and anything that is not yet
+      a concrete bug or feature request.

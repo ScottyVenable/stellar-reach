@@ -1,0 +1,14 @@
+{
+  "id": "example-mod",
+  "name": "Example Mod",
+  "version": "0.1.0",
+  "author": "Sol",
+  "description": "Reference mod that demonstrates the v0.2 data registry. Adds two goods used by the loader's smoke tests.",
+  "gameVersion": "^0.2.0",
+  "manifestVersion": 1,
+  "dependencies": [],
+  "load": {
+    "goods": "data/goods.json"
+  },
+  "overrides": {}
+}

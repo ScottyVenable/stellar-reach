@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useGameStore } from '../../state/store';
 import { generateSeedString } from '../../engine/rng';
+import { changelog } from '../../engine/changelog';
+import { ChangelogModal } from '../components/ChangelogModal';
 
 export function TitleScreen() {
   const startNewGame = useGameStore((s) => s.startNewGame);
   const [seed, setSeed] = useState<string>(() => generateSeedString());
   const [name, setName] = useState<string>('Captain Ren');
+  const [showChangelog, setShowChangelog] = useState(false);
 
   return (
     <div className="title-screen">
@@ -45,6 +48,16 @@ export function TitleScreen() {
           Launch Campaign
         </button>
       </div>
+      <button
+        type="button"
+        className="version-chip"
+        onClick={() => setShowChangelog(true)}
+        aria-label="Open changelog"
+        title="View changelog"
+      >
+        v{changelog.currentVersion}
+      </button>
+      {showChangelog ? <ChangelogModal onClose={() => setShowChangelog(false)} /> : null}
     </div>
   );
 }

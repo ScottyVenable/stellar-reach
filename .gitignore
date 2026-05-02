@@ -13,3 +13,8 @@ android
 *.log
 coverage
 *.tsbuildinfo
+
+# Internal-only documentation lives in the sibling folder outside this repo.
+# Never commit it.
+../internal-dev-docs/
+internal-dev-docs/

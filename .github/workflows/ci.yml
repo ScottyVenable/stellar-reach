@@ -1,0 +1,78 @@
+name: CI
+
+# Lightweight CI for the development branch and any PR targeting it.
+# Runs typecheck, lint, build, and the changelog parser. Does NOT publish
+# releases (that is release.yml's job, gated to alpha/main).
+
+on:
+  push:
+    branches: [development]
+  pull_request:
+    branches: [development]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Parse changelog (verifies CHANGELOG.md format)
+        run: node scripts/parse-changelog.mjs
+
+      - name: Compute version
+        id: version
+        run: |
+          set -euo pipefail
+          VERSION=$(node scripts/version.mjs)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION"
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_BASE: './'
+
+      - name: Reject emoji in changed files
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          # Pull base ref so we can diff.
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          BASE_SHA=$(git rev-parse "origin/${{ github.base_ref }}")
+          # Pictographic ranges are matched by Perl regex \p{Extended_Pictographic}.
+          # We use grep -P. The skill is to scan only added lines.
+          ADDED=$(git diff "$BASE_SHA"...HEAD -- ':!**/*.png' ':!**/*.jpg' ':!**/*.jpeg' ':!**/*.gif' ':!**/*.svg' ':!**/*.ico' ':!**/*.webp' ':!**/*.lock' ':!package-lock.json' | grep -E '^\+' | grep -v '^+++') || true
+          if echo "$ADDED" | grep -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}\x{1F600}-\x{1F64F}\x{1F680}-\x{1F6FF}]' >/dev/null 2>&1; then
+            echo "::error::Emoji detected in added lines. The repository policy is no emojis in code, docs, or content."
+            echo "Offending lines:"
+            echo "$ADDED" | grep -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}\x{1F600}-\x{1F64F}\x{1F680}-\x{1F6FF}]' | head -50
+            exit 1
+          fi
+          echo "No emoji found in added lines."

@@ -1,0 +1,31 @@
+name: Content addition
+description: New goods, races, modules, traits, events, or factions.
+title: "[content] "
+labels: ["type:content", "triage"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Good
+        - Race
+        - Ship module
+        - Crew trait
+        - Transit event
+        - Station kind
+        - Faction / storyline
+    validations:
+      required: true
+  - type: textarea
+    id: spec
+    attributes:
+      label: Specification
+      description: All the fields needed to author this in `src/data/` (or `src/data/json/` if mod-loadable).
+    validations:
+      required: true
+  - type: textarea
+    id: flavour
+    attributes:
+      label: Flavour text
+      description: Short prose. No emojis.

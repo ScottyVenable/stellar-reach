@@ -1,0 +1,19 @@
+name: Modding / data API
+description: Modding-related changes, schemas, or example mods.
+title: "[mod] "
+labels: ["type:mod", "triage"]
+body:
+  - type: textarea
+    id: change
+    attributes:
+      label: Change
+      description: What schema, loader behaviour, or example mod is being added or modified?
+    validations:
+      required: true
+  - type: textarea
+    id: compat
+    attributes:
+      label: Compatibility impact
+      description: Does this break existing mods? Does it require a manifest version bump?
+    validations:
+      required: true

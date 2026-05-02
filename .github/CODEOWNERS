@@ -1,0 +1,19 @@
+# GitHub-native owners file. Approvers are matched against the most specific
+# pattern below. The CODEOWNERS team reviews everything by default.
+
+* @ScottyVenable
+
+# Engine and save-format changes need a Lead Programmer review.
+/src/engine/                     @ScottyVenable
+/src/engine/save.ts              @ScottyVenable
+
+# Content tweaks (goods, races, modules, traits, events) get a content review.
+/src/data/                       @ScottyVenable
+/mods/                           @ScottyVenable
+
+# Tooling, CI, and the changelog format are owned by the maintainer.
+/.github/                        @ScottyVenable
+/scripts/                        @ScottyVenable
+/CHANGELOG.md                    @ScottyVenable
+/docs/CHANGELOG_FORMAT.md        @ScottyVenable
+/docs/ROADMAP.md                 @ScottyVenable

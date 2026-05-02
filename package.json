@@ -1,17 +1,20 @@
 {
   "name": "stellar-reach",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.0-dev.0",
   "type": "module",
   "main": "electron/main.cjs",
   "description": "Stellar Reach - a sci-fi mobile trading and management simulator (PWA).",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "npm run prebuild && vite",
+    "build": "npm run prebuild && tsc -b && vite build",
     "preview": "vite preview --port 4173",
-    "typecheck": "tsc -b --noEmit",
+    "typecheck": "npm run prebuild && tsc -b --noEmit",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "electron:build": "npm run build && electron-builder --publish never"
+    "electron:build": "npm run build && electron-builder --publish never",
+    "prebuild": "node scripts/parse-changelog.mjs",
+    "version:print": "node scripts/version.mjs",
+    "version:json": "node scripts/version.mjs --json"
   },
   "dependencies": {
     "react": "^18.3.1",

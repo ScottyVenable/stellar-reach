@@ -1,0 +1,31 @@
+name: Balance change
+description: Numeric / content tuning proposal.
+title: "[balance] "
+labels: ["type:balance", "triage"]
+body:
+  - type: textarea
+    id: observation
+    attributes:
+      label: Observation
+      description: What is the current value, and what behaviour does it produce in play?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: New value, new curve, or new bias. Be specific.
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Supporting data
+      description: Seeds, screenshots, log excerpts, or spreadsheet links.
+  - type: input
+    id: scope
+    attributes:
+      label: Scope
+      placeholder: "single good / category / station kind / race / module"
+    validations:
+      required: true

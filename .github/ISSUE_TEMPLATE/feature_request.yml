@@ -1,0 +1,39 @@
+name: Feature request
+description: Propose a new system, screen, or mechanic.
+title: "[feat] "
+labels: ["type:feature", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / opportunity
+      description: What player goal or design tension does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: One-paragraph sketch. Keep it concrete. Mention which files or systems it touches.
+    validations:
+      required: true
+  - type: dropdown
+    id: pillar
+    attributes:
+      label: Primary pillar served
+      options:
+        - Calm density
+        - Emergent narrative
+        - Portrait, one-handed
+        - Authored systems / generated content
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: input
+    id: roadmap
+    attributes:
+      label: Roadmap milestone (if any)
+      placeholder: "M11 — Station Ownership"

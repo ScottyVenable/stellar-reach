@@ -1,0 +1,26 @@
+name: Sync labels
+
+# Manually triggered: applies the catalog in `.github/labels.yml` to the
+# repository so that issue / PR templates can rely on the labels existing.
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [development]
+    paths:
+      - '.github/labels.yml'
+
+permissions:
+  issues: write
+  pull-requests: write
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EndBug/label-sync@v2
+        with:
+          config-file: .github/labels.yml
+          delete-other-labels: false

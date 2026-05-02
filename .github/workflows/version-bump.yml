@@ -1,0 +1,82 @@
+name: Version Bump and Changelog Promote
+
+# Runs after a PR is merged into development, alpha, or main. It:
+#   1. Determines the bump kind from the merged PR labels (default: patch).
+#   2. Rewrites the human portion of `package.json` "version" so the channel
+#      suffix matches the target branch.
+#   3. Promotes `## [Unreleased]` in CHANGELOG.md into a dated, versioned
+#      release block matching the new version and channel.
+#   4. Commits the result back to the target branch with [skip ci].
+#
+# A "promote: ..." PR (development -> alpha or alpha -> main) skips step 1
+# and only adjusts the channel suffix.
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [development, alpha, main]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: version-bump-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    if: github.event.pull_request.merged == true && !contains(github.event.pull_request.labels.*.name, 'skip-version-bump')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Bump version and promote changelog
+        id: bump
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels) }}
+        run: |
+          set -euo pipefail
+          node .github/scripts/bump-and-promote.mjs
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          BUILD=$(git rev-list --count HEAD)
+          echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+          echo "build=$BUILD" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "Sol"
+          git config user.email "sol@galactic-trader.dev"
+          git add package.json CHANGELOG.md
+          git commit -m "chore(release): v${{ steps.bump.outputs.new_version }} [skip ci]" \
+                     -m "Auto-promoted from PR #${{ github.event.pull_request.number }}."
+          git push origin "HEAD:${{ github.event.pull_request.base.ref }}"
+
+      - name: Tag version (alpha and main only)
+        if: github.event.pull_request.base.ref == 'alpha' || github.event.pull_request.base.ref == 'main'
+        run: |
+          set -euo pipefail
+          TAG="v${{ steps.bump.outputs.new_version }}"
+          if [ "${{ github.event.pull_request.base.ref }}" != "main" ]; then
+            TAG="$TAG.${{ steps.bump.outputs.build }}"
+          fi
+          git tag "$TAG"
+          git push origin "$TAG"

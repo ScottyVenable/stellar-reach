@@ -1,0 +1,55 @@
+name: Bug report
+description: Something does not behave the way the design intends.
+title: "[bug] "
+labels: ["type:bug", "triage"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Found in the bottom-left of the title screen, or via the in-game changelog viewer.
+      placeholder: "0.2.0-dev.435"
+    validations:
+      required: true
+  - type: dropdown
+    id: channel
+    attributes:
+      label: Channel
+      options:
+        - development
+        - alpha
+        - main (stable)
+    validations:
+      required: true
+  - type: input
+    id: seed
+    attributes:
+      label: Galaxy seed (if applicable)
+      placeholder: "VOID-0F3A"
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal numbered steps from the title screen.
+      placeholder: |
+        1. Start a campaign with seed VOID-0F3A.
+        2. Buy 5 Solvex at Cygnus Reach Trade Hub.
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Captain's Log excerpt or screenshot (optional)

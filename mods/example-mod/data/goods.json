@@ -1,0 +1,20 @@
+[
+  {
+    "id": "example-mod:plasma-tea",
+    "name": "Plasma Tea",
+    "category": "Luxury",
+    "basePrice": 180,
+    "bulk": 0.5,
+    "legality": "legal",
+    "description": "A ceremonial Vendari drink served at near-fusion temperatures. The cup matters more than the leaf."
+  },
+  {
+    "id": "example-mod:reef-pearl",
+    "name": "Reef Pearl",
+    "category": "Cultural",
+    "basePrice": 720,
+    "bulk": 0.2,
+    "legality": "restricted",
+    "description": "Cultivated by Aelyn deep-coral colonies under a strict export quota."
+  }
+]
