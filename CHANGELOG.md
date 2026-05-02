@@ -37,11 +37,27 @@ Categories (omit a category if it has no entries):
   and the PWA manifest no longer locks orientation to portrait. (#89)
 
 ### Improvements
+- Datapad visual restyle. Sharp-cornered panels replace the previous
+  rounded look. Two accent colours dominate: muted neon green
+  (`#7BD389`) for confirm / active / nominal states, muted red
+  (`#E5484D`) for warnings / close / critical. Cyan, violet, and amber
+  are demoted to secondary accents. New `PanelHeader` component renders
+  a monospace tag like `MARKET / FN03` with a thin status strip on every
+  gameplay screen. Numeric readouts use a monospace face; labels use
+  small uppercase tracked sans. Decorative diagonal-stripe accents anchor
+  the four corners of the app shell. Reduced-motion preference respected.
+  (#90)
 - Save files now carry a version envelope (`{ v, state }`) and migrate
   forward automatically on load. Legacy saves written by v0.1.x are detected
   by the old key and migrated seamlessly — no save lost on upgrade. (#21)
 
 ### Bug Fixes
+- Datapad redesign accessibility/layout fixes: corner-accent stripes now
+  anchor to the `.app` shell (added `position: relative`) instead of
+  drifting to the viewport corners on tablet-width layouts; `PanelHeader`
+  renders a real heading element (default `<h2>`, optional `as="h3"`)
+  so screen-reader heading navigation continues to land on each panel
+  title. (#90)
 - Replaced `Math.random()` bootstrap calls in `src/engine/rng.ts` and
   `src/engine/game.ts` with `crypto.getRandomValues()`, satisfying the
   determinism policy. The UI and engine no longer call `Math.random`

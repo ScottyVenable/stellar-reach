@@ -2,6 +2,7 @@ import { useGameStore } from '../../state/store';
 import { CREW_TRAITS_BY_ID } from '../../data/traits';
 import { RACES_BY_ID } from '../../data/races';
 import type { CrewMember } from '../../engine/types';
+import { PanelHeader } from '../components/PanelHeader';
 
 function CrewRow({ member, action, actionLabel, actionDisabled, secondary, secondaryLabel }: {
   member: CrewMember;
@@ -60,7 +61,12 @@ export function CrewScreen() {
   return (
     <div>
       <div className="card">
-        <h3>Active Crew ({game.player.crew.length}/8)</h3>
+        <PanelHeader
+          tag="CREW"
+          code="FN02"
+          status="ok"
+          rightSlot={`${game.player.crew.length}/8 ACTIVE`}
+        />
         {game.player.crew.length === 0 && <div className="muted">You fly alone.</div>}
         {game.player.crew.map((m) => (
           <CrewRow
@@ -75,7 +81,7 @@ export function CrewScreen() {
       </div>
 
       <div className="card">
-        <h3>Hire Roster — Local Spaceport</h3>
+        <PanelHeader tag="ROSTER" code="FN02B" status="ok" rightSlot="LOCAL PORT" />
         {game.hireRoster.length === 0 && <div className="muted">No-one is looking for a berth here.</div>}
         {game.hireRoster.map((m) => {
           const fee = m.wage * 5;

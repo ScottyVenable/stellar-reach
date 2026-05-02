@@ -44,6 +44,10 @@ export function App() {
   // markup; CSS picks where each child sits.
   return (
     <div className="app">
+      <div className="corner-accent corner-tl" aria-hidden="true" />
+      <div className="corner-accent corner-tr" aria-hidden="true" />
+      <div className="corner-accent corner-bl" aria-hidden="true" />
+      <div className="corner-accent corner-br" aria-hidden="true" />
       <TopBar />
       <TabBar tabs={SCREEN_LABELS} />
       <main className="screen">
