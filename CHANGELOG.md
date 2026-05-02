@@ -28,6 +28,10 @@ Categories (omit a category if it has no entries):
 -->
 
 ### Internal
+- Bumped CI and release workflows from Node.js 20 to Node.js 22 to satisfy
+  the Capacitor CLI minimum requirement (`>=22`); also updated the Android
+  build job from Java 17 to Java 21 to match Gradle's `sourceCompatibility`
+  target and avoid the `invalid source release: 21` build error.
 - Established three-tier branch model (`development` -> `alpha` -> `main`)
   with `development` as the default branch.
 - Introduced the **Sol** agent persona and the operating manual at
