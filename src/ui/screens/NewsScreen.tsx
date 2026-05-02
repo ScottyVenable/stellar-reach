@@ -1,5 +1,6 @@
 import { useGameStore } from '../../state/store';
 import { GOODS_BY_ID } from '../../data/goods';
+import { PanelHeader } from '../components/PanelHeader';
 
 export function NewsScreen() {
   const game = useGameStore((s) => s.game)!;
@@ -8,7 +9,7 @@ export function NewsScreen() {
   return (
     <div>
       <div className="card">
-        <h3>Galactic News Feed</h3>
+        <PanelHeader tag="COMMS" code="FN05" status="ok" rightSlot={`${items.length} ITEMS`} />
         {items.length === 0 && <div className="muted">All quiet across the reach.</div>}
         {items.map((n) => {
           const sys = n.systemId ? game.galaxy.systems.find((s) => s.id === n.systemId) : undefined;

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useGameStore } from '../../state/store';
 import { allStations, currentStation, estimateRoute } from '../../engine/game';
 import { GOODS_BY_ID } from '../../data/goods';
+import { PanelHeader } from '../components/PanelHeader';
 
 export function MissionsScreen() {
   const game = useGameStore((s) => s.game)!;
@@ -25,7 +26,7 @@ export function MissionsScreen() {
   return (
     <div>
       <div className="card">
-        <h3>Hire a Courier</h3>
+        <PanelHeader tag="COURIER" code="FN06" status="ok" />
         <div className="muted" style={{ marginBottom: 8 }}>
           Pay an independent crew to ferry cargo while you stay in port. Their pay is calculated
           against the destination market price; expect ~92% of fair value on delivery.
