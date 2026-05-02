@@ -22,8 +22,9 @@ import type { GalaxyState, StarSystem } from '../../engine/types';
 // ---------------------------------------------------------------------------
 
 const GALAXY_BOUNDS = 1000;
-const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 4;
+// sol: zoom bounds (MIN_ZOOM / MAX_ZOOM) and the matching `clampZoom`
+// helper land with the pan/zoom gesture handlers in #94 — intentionally
+// omitted from the scaffold to keep the surface lint-clean.
 
 interface Props {
   galaxy: GalaxyState;
@@ -46,10 +47,6 @@ interface ViewBox {
 
 const INITIAL_VIEW: ViewBox = { x: 0, y: 0, w: GALAXY_BOUNDS, h: GALAXY_BOUNDS };
 
-function clampZoom(z: number): number {
-  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z));
-}
-
 export function GalaxyMap({
   galaxy,
   currentSystemId,
@@ -67,23 +64,26 @@ export function GalaxyMap({
     [factionColour],
   );
 
-  // Reset is exposed via a button overlay so the player can recover from a
-  // disorienting zoom. Pan/zoom gestures themselves arrive in a follow-up
-  // sub-task; the scaffold leaves the view static at the default bounds.
+  // Reset is exposed via an absolutely-positioned overlay button (see
+  // `.galaxy-map-reset` in global.css) so the player can recover from a
+  // disorienting zoom without scrolling. Pan/zoom gestures themselves
+  // arrive in a follow-up sub-task; the scaffold leaves the view static
+  // at the default bounds.
   function resetView() {
     setView(INITIAL_VIEW);
   }
 
-  // Reserved for the pan/zoom sub-task; suppresses unused-warning for
-  // clampZoom while the scaffold is in place.
-  void clampZoom;
+  function activate(sys: StarSystem) {
+    onSelectSystem?.(sys);
+  }
 
   return (
     <div className="galaxy-map" data-scaffold="true">
-      <svg viewBox={viewBoxStr} role="img" aria-label="Galaxy map">
+      <svg viewBox={viewBoxStr} aria-label="Galaxy map">
         {systems.map((sys) => {
           const isCurrent = sys.id === currentSystemId;
           const isSelected = sys.id === selectedSystemId;
+          const interactive = !!onSelectSystem;
           return (
             <g key={sys.id}>
               <circle
@@ -94,9 +94,21 @@ export function GalaxyMap({
                 fillOpacity={0.25}
                 stroke={isCurrent ? 'var(--accent-ok)' : isSelected ? 'var(--accent-amber)' : colourOf(sys)}
                 strokeWidth={isCurrent ? 2.5 : 1.5}
-                onClick={() => onSelectSystem?.(sys)}
-                style={{ cursor: onSelectSystem ? 'pointer' : 'default' }}
-              />
+                onClick={() => activate(sys)}
+                onKeyDown={(e) => {
+                  if (!interactive) return;
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    activate(sys);
+                  }
+                }}
+                tabIndex={interactive ? 0 : -1}
+                role={interactive ? 'button' : undefined}
+                aria-label={`Select system ${sys.name}`}
+                style={{ cursor: interactive ? 'pointer' : 'default' }}
+              >
+                <title>{sys.name}</title>
+              </circle>
               <text
                 x={sys.x}
                 y={sys.y - 18}

@@ -13,9 +13,11 @@ interface Props {
 }
 
 export function MiniMap({ galaxy, currentSystemId }: Props) {
+  const titleId = 'minimap-title';
   return (
-    <div className="minimap" aria-label="Galaxy mini-map">
-      <svg viewBox="0 0 1000 1000" role="img">
+    <div className="minimap">
+      <svg viewBox="0 0 1000 1000" role="img" aria-labelledby={titleId}>
+        <title id={titleId}>Galaxy mini-map</title>
         {galaxy.systems.map((sys) => {
           const isCurrent = sys.id === currentSystemId;
           return (

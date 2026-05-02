@@ -62,13 +62,14 @@ export function SystemMap({
   selectedStationId,
   onSelectStation,
 }: Props) {
+  const titleId = `system-map-title-${system.id}`;
   return (
     <div className="system-map" data-scaffold="true">
       <svg
         viewBox={`0 0 ${SYSTEM_BOUNDS} ${SYSTEM_BOUNDS}`}
-        role="img"
-        aria-label={`${system.name} system map`}
+        aria-labelledby={titleId}
       >
+        <title id={titleId}>{`${system.name} system map`}</title>
         {/* Central star — decorative anchor point. */}
         <circle
           cx={SYSTEM_BOUNDS / 2}
@@ -83,15 +84,27 @@ export function SystemMap({
         {system.stations.map((station) => {
           const isCurrent = station.id === currentStationId;
           const isSelected = station.id === selectedStationId;
+          const interactive = !!onSelectStation;
           return (
             <g
               key={station.id}
               onClick={() => onSelectStation?.(station)}
-              style={{ cursor: onSelectStation ? 'pointer' : 'default' }}
+              onKeyDown={(e) => {
+                if (!interactive) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectStation?.(station);
+                }
+              }}
+              tabIndex={interactive ? 0 : -1}
+              role={interactive ? 'button' : undefined}
+              aria-label={`Select station ${station.name} (${station.kind})`}
+              style={{ cursor: interactive ? 'pointer' : 'default' }}
               fill={isCurrent ? 'var(--accent-ok)' : isSelected ? 'var(--accent-amber)' : 'var(--bg-3)'}
               stroke={isCurrent ? 'var(--accent-ok)' : isSelected ? 'var(--accent-amber)' : 'var(--line-2)'}
               strokeWidth={isCurrent ? 2 : 1}
             >
+              <title>{`${station.name} — ${station.kind}`}</title>
               {glyphForStationKind(station)}
               <text
                 x={station.x}

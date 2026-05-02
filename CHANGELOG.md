@@ -49,6 +49,13 @@ Categories (omit a category if it has no entries):
   Full implementation lands across three sub-issues of #91. (Refs #91)
 
 ### Bug Fixes
+- Galaxy map scaffold now sizes correctly via shared `.galaxy-map` /
+  `.system-map` CSS rules (mirrors `.starmap`); previously the new SVGs
+  fell back to the 300x150 default. Markers in `GalaxyMap` and
+  `SystemMap` are keyboard-focusable with `role="button"`, descriptive
+  `aria-label`s, and Enter/Space activation; `role="img"` removed from
+  the interactive SVGs. `MiniMap` now exposes its name to assistive tech
+  via `<title>` + `aria-labelledby` on the `<svg>` itself. (Refs #91)
 - Replaced `Math.random()` bootstrap calls in `src/engine/rng.ts` and
   `src/engine/game.ts` with `crypto.getRandomValues()`, satisfying the
   determinism policy. The UI and engine no longer call `Math.random`

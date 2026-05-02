@@ -407,6 +407,40 @@ select {
   stroke: var(--accent-cyan);
 }
 
+/*
+ * GalaxyMap / SystemMap share the .starmap sizing contract: full-width,
+ * 1:1 aspect ratio, framed background, SVG fills the container. The
+ * .galaxy-map wrapper additionally hosts the absolutely-positioned reset
+ * control as a top-right overlay.
+ */
+.galaxy-map,
+.system-map {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(167, 139, 250, 0.08), transparent 60%),
+    radial-gradient(circle at 70% 70%, rgba(34, 211, 238, 0.08), transparent 55%),
+    var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.galaxy-map svg,
+.system-map svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.galaxy-map-reset {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
