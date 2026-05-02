@@ -2,22 +2,22 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/version-0.1.0--dev-blue?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.2.0--dev-blue?style=flat-square)](CHANGELOG.md)
 [![Channel](https://img.shields.io/badge/channel-development-6366f1?style=flat-square)](docs/BRANCHING.md)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/React-18-61dafb?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-7-646cff?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![PWA](https://img.shields.io/badge/PWA-installable-5a0fc8?style=flat-square&logo=pwa&logoColor=white)](public/manifest.webmanifest)
-[![Electron](https://img.shields.io/badge/Electron-41-47848f?style=flat-square&logo=electron&logoColor=white)](electron/main.cjs)
-[![Android](https://img.shields.io/badge/Android-Capacitor_8-3ddc84?style=flat-square&logo=android&logoColor=white)](capacitor.config.json)
-[![CI](https://img.shields.io/github/actions/workflow/status/ScottyVenable/galactic-trader/ci.yml?branch=development&style=flat-square&label=CI)](https://github.com/ScottyVenable/galactic-trader/actions)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18-61dafb?style=flat-square)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-7-646cff?style=flat-square)](https://vitejs.dev/)
+[![PWA](https://img.shields.io/badge/PWA-installable-5a0fc8?style=flat-square)](public/manifest.webmanifest)
+[![Electron](https://img.shields.io/badge/Electron-41-47848f?style=flat-square)](electron/main.cjs)
+[![Android](https://img.shields.io/badge/Android-Capacitor_8-3ddc84?style=flat-square)](capacitor.config.json)
+[![CI](https://img.shields.io/github/actions/workflow/status/ScottyVenable/stellar-reach/ci.yml?branch=development&style=flat-square&label=CI)](https://github.com/ScottyVenable/stellar-reach/actions)
 [![License](https://img.shields.io/badge/license-private-red?style=flat-square)](#privacy)
 
 **Captain a starship. Trade across six civilisations. Build a crew. Survive the void.**
 
 A sci-fi mobile trading and management simulator — installable PWA, Windows desktop, and Android APK, all from a single codebase.
 
-[Play (PWA)](https://scottyvenable.github.io/galactic-trader/) · [Changelog](CHANGELOG.md) · [Roadmap](docs/ROADMAP.md) · [GDD](docs/GDD.md) · [Contributing](.github/CONTRIBUTING.md)
+[Play (PWA)](https://scottyvenable.github.io/stellar-reach/) · [Changelog](CHANGELOG.md) · [Roadmap](docs/ROADMAP.md) · [GDD](docs/GDD.md) · [Contributing](.github/CONTRIBUTING.md)
 
 </div>
 

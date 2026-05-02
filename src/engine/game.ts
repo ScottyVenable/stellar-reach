@@ -13,7 +13,7 @@ import {
   TransitChoiceOutcome,
   TransitEvent,
 } from './types';
-import { createRng, generateSeedString, type Rng } from './rng';
+import { createRng, generateSeedString, cryptoRandomUint32, type Rng } from './rng';
 import { generateGalaxy, allStations, findStation, findSystemOfStation } from './galaxy';
 export { allStations, findStation, findSystemOfStation };
 import { generateHireRoster, tickCrew, effectiveSkill } from './crew';
@@ -75,7 +75,11 @@ export interface NewGameOptions {
 }
 
 export function newGame(opts: NewGameOptions = {}): GameState {
-  const rng = createRng(opts.seed ?? `${Date.now()}-${Math.random()}`);
+  // When no seed is given we derive one from a crypto-random uint32 XORed with
+  // the current timestamp, then let generateSeedString format it as a human-
+  // readable string (e.g. "NOVA-7421"). Using crypto avoids Math.random.
+  const bootSeed = opts.seed ?? String(cryptoRandomUint32() ^ (Date.now() >>> 0));
+  const rng = createRng(bootSeed);
   const seed = opts.seed ?? generateSeedString(rng);
   const galaxy = generateGalaxy(seed);
   const startStation = allStations(galaxy)[0];

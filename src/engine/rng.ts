@@ -89,9 +89,25 @@ export function createRng(seed: number | string): Rng {
   return rng;
 }
 
+/**
+ * Returns a random 32-bit unsigned integer suitable for seeding the PRNG.
+ * Uses `crypto.getRandomValues` where available (all browsers, Node 19+).
+ * Falls back to a time-based value if crypto is absent (e.g. test workers
+ * that polyfill the env without crypto).
+ */
+export function cryptoRandomUint32(): number {
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const buf = new Uint32Array(1);
+    crypto.getRandomValues(buf);
+    return buf[0];
+  }
+  // Degraded fallback — still better than nothing in unusual environments.
+  return (Date.now() * 1000003) >>> 0;
+}
+
 /** Generates a short, human-friendly seed string like "NOVA-7421". */
 export function generateSeedString(rng?: Rng): string {
-  const r = rng ?? createRng(Date.now() ^ Math.floor(Math.random() * 0xffffffff));
+  const r = rng ?? createRng(cryptoRandomUint32() ^ (Date.now() >>> 0));
   const prefixes = ['NOVA', 'ORION', 'HELIX', 'AURIGA', 'CYGNUS', 'LYRA', 'VEGA', 'KEPLER', 'PULSAR', 'QUASAR'];
   const prefix = r.pick(prefixes);
   const num = r.int(1000, 9999);

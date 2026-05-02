@@ -27,6 +27,17 @@ Categories (omit a category if it has no entries):
   ### Internal
 -->
 
+### Improvements
+- Save files now carry a version envelope (`{ v, state }`) and migrate
+  forward automatically on load. Legacy saves written by v0.1.x are detected
+  by the old key and migrated seamlessly — no save lost on upgrade. (#21)
+
+### Bug Fixes
+- Replaced `Math.random()` bootstrap calls in `src/engine/rng.ts` and
+  `src/engine/game.ts` with `crypto.getRandomValues()`, satisfying the
+  determinism policy. The UI and engine no longer call `Math.random`
+  anywhere. (#22)
+
 ### Internal
 - Bumped CI and release workflows from Node.js 20 to Node.js 22 to satisfy
   the Capacitor CLI minimum requirement (`>=22`); also updated the Android
@@ -43,6 +54,10 @@ Categories (omit a category if it has no entries):
 - Added the mod-loader scaffold under `mods/` with an example mod and a
   draft JSON schema in `src/engine/mods.ts`.
 - Added the in-game changelog viewer accessible from the title screen.
+- Bumped version to 0.2.0-dev.0 to mark Phase A (Foundations and Pipeline)
+  complete and gate the `development -> alpha` promotion. (#23)
+- Corrected stale `galactic-trader` repository references in README badges
+  and links to point at the live `stellar-reach` repository. (#24)
 
 ---
 
