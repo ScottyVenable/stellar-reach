@@ -7,6 +7,11 @@ import { GOODS_BY_ID } from '../../data/goods';
 
 type SafetyChoice = 'safe' | 'fast';
 
+/** Fraction below galactic base price that qualifies as a buy opportunity. */
+const BUY_OPPORTUNITY_THRESHOLD = 0.1;
+/** Maximum number of trade hints shown for a destination. */
+const MAX_TRADE_HINTS = 4;
+
 export function HelmScreen() {
   const game = useGameStore((s) => s.game)!;
   const beginTrip = useGameStore((s) => s.beginTrip);
@@ -49,12 +54,12 @@ export function HelmScreen() {
       const good = GOODS_BY_ID[thereEntry.goodId];
       if (!good) continue;
       const delta = good.basePrice - thereEntry.price;
-      if (delta > good.basePrice * 0.1) {
+      if (delta > good.basePrice * BUY_OPPORTUNITY_THRESHOLD) {
         hints.push({ name: good.name, delta, action: 'buy' });
       }
     }
 
-    return hints.sort((a, b) => b.delta - a.delta).slice(0, 4);
+    return hints.sort((a, b) => b.delta - a.delta).slice(0, MAX_TRADE_HINTS);
   }, [target, station, game.player.ship.hold]);
 
   return (

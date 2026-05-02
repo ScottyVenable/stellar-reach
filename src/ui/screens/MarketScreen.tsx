@@ -20,6 +20,9 @@ const CATEGORIES: ('All' | GoodCategory)[] = [
   'Cultural',
 ];
 
+/** Percentage deviation from galactic base price below which the trend is shown as neutral. */
+const PRICE_TREND_THRESHOLD = 3;
+
 export function MarketScreen() {
   const game = useGameStore((s) => s.game)!;
   const buy = useGameStore((s) => s.buy);
@@ -79,8 +82,8 @@ export function MarketScreen() {
           // Price trend vs galactic base price
           const delta = e.price - good.basePrice;
           const pct = good.basePrice > 0 ? (delta / good.basePrice) * 100 : 0;
-          const trendLabel = Math.abs(pct) < 3 ? '=' : pct > 0 ? `▲${Math.abs(pct).toFixed(0)}%` : `▼${Math.abs(pct).toFixed(0)}%`;
-          const trendClass = Math.abs(pct) < 3 ? 'muted' : pct > 0 ? 'amber' : 'cyan';
+          const trendLabel = Math.abs(pct) < PRICE_TREND_THRESHOLD ? '=' : pct > 0 ? `▲${Math.abs(pct).toFixed(0)}%` : `▼${Math.abs(pct).toFixed(0)}%`;
+          const trendClass = Math.abs(pct) < PRICE_TREND_THRESHOLD ? 'muted' : pct > 0 ? 'amber' : 'cyan';
 
           // Max amounts for convenience buttons
           const maxBuy = Math.min(
