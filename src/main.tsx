@@ -1,6 +1,19 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './ui/App';
+
+// Self-hosted typography pairing.
+//   Display: Chakra Petch (HUD chrome, headings, console buttons)
+//   Body:    Space Grotesk (paragraph and form text)
+//   Mono:    JetBrains Mono (numerics, panel labels, breadcrumbs)
+import '@fontsource/chakra-petch/600.css';
+import '@fontsource/chakra-petch/700.css';
+import '@fontsource/space-grotesk/400.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+
 import './styles/global.css';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
