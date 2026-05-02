@@ -53,6 +53,26 @@ Categories (omit a category if it has no entries):
   and the PWA manifest no longer locks orientation to portrait. (#89)
 
 ### Improvements
+- UI rehaul pass 2: AAA polish push. Panels and HUD cells gain layered
+  surfaces with inset bezel highlights, outer drop shadows, and clip-path
+  bevel cuts at the top-right and bottom-left corners. Buttons now have
+  real press feedback (inset shadow + reversed gradient on `:active`).
+  HUD vessel readouts switched from full-width progress bars to
+  twelve-segment status meters with per-tone glow (green / amber / red
+  / cyan). Credits use a generic-currency glyph (`U+00A4`) plus
+  three-digit-grouped tabular numerals. Tab rail picks up an animated
+  scanline sweep and an amber bracket on the active item. Mobile gains a
+  pull-up status sheet for full HUD content the topbar can no longer
+  fit, and the topbar itself becomes a 3-column grid with eyebrow + name
+  + compact credits + ghost actions. Title screen rebuilt around a
+  deterministic 110-star CSS starfield (seeded via `createRng`), a
+  perspective horizon grid, an animated wordmark with tracked-out letter
+  spacing, an arrow-clipped action stack (New Voyage / Patch Notes /
+  Settings / Quit when running in Electron), and a footer with a
+  channel-coloured version chip and a `SYSTEMS NOMINAL` indicator.
+  All new motion gated behind `prefers-reduced-motion: no-preference`
+  and the `[data-motion='reduce']` override. New `useSfx()` hook stub
+  ready for a real audio layer. (#100)
 - Datapad visual restyle. Sharp-cornered panels replace the previous
   rounded look. Two accent colours dominate: muted neon green
   (`#7BD389`) for confirm / active / nominal states, muted red
@@ -75,6 +95,11 @@ Categories (omit a category if it has no entries):
   Full implementation lands across three sub-issues of #91. (Refs #91)
 
 ### Bug Fixes
+- Pass-1 UI screenshot script matched tabs by `textContent === 'Market'`,
+  but tab buttons render the label plus an `Fn` hint span, so the matcher
+  always failed and every desktop screenshot captured the Market screen.
+  Tabs now expose a `data-screen` attribute and the screenshot script
+  queries that. (#100)
 - Datapad redesign accessibility/layout fixes: corner-accent stripes now
   anchor to the `.app` shell (added `position: relative`) instead of
   drifting to the viewport corners on tablet-width layouts; `PanelHeader`

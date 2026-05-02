@@ -5,9 +5,9 @@
  *   node scripts/ui-screenshots.mjs <out-dir>
  *
  * Spins up a Playwright Chromium browser, drives the running dev server at
- * http://localhost:5173, and captures every primary screen at three
- * viewports (mobile portrait, breakpoint, desktop). The dev server must
- * already be running.
+ * http://localhost:5173, and captures every primary screen at four
+ * viewports (mobile portrait, breakpoint, desktop 720p, desktop 1080p).
+ * The dev server must already be running.
  *
  * Naming: <out-dir>/<screen>-<width>.png
  */
@@ -19,6 +19,7 @@ const VIEWPORTS = [
   { label: 'mobile', width: 375, height: 812 },
   { label: 'breakpoint', width: 960, height: 600 },
   { label: 'desktop', width: 1280, height: 720 },
+  { label: 'desktop-fullhd', width: 1920, height: 1080 },
 ];
 
 // Internal screen ids exposed by the store. The title screen is captured
@@ -49,39 +50,35 @@ async function main() {
       await page.goto(BASE, { waitUntil: 'networkidle' });
       await page.evaluate(() => localStorage.clear());
       await page.reload({ waitUntil: 'networkidle' });
-      await page.waitForSelector('h1', { timeout: 5000 });
+      await page.waitForSelector('.title-display', { timeout: 5000 });
+      await page.waitForTimeout(300);
       await page.screenshot({
         path: `${outDir}/title-${vp.width}.png`,
         fullPage: false,
       });
 
-      // Launch a campaign with a stable seed for reproducibility.
+      // Open the New Voyage card and launch.
+      const newVoyage = page.locator('button.title-action.primary');
+      if (await newVoyage.count()) {
+        await newVoyage.first().click();
+        await page.waitForTimeout(150);
+      }
       await page.fill('#captain-name', 'Captain Ren');
       await page.fill('#seed', 'STELLA-9001');
       await page.getByRole('button', { name: 'Launch Campaign' }).click();
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(500);
 
       for (const sid of SCREENS) {
+        // Match the data-screen attribute on console buttons. This is
+        // robust against label text changes and against the F-key span
+        // bleeding into textContent.
         await page.evaluate((s) => {
-          // The store exposes setScreen via the zustand `useGameStore`
-          // hook; the simplest portable way to drive it from Playwright
-          // is to click the matching nav button when present, falling
-          // back to a direct store call only as a last resort.
-          const labels = {
-            market: 'Market',
-            ship: 'Ship',
-            crew: 'Crew',
-            helm: 'Helm',
-            news: 'News',
-            missions: 'Jobs',
-            log: 'LOG',
-          };
-          const target = labels[s];
-          const btns = Array.from(document.querySelectorAll('button'));
-          const hit = btns.find((b) => (b.textContent ?? '').trim() === target);
-          if (hit) hit.click();
+          const btn = document.querySelector(
+            `.console-btn[data-screen="${s}"]`,
+          );
+          if (btn) (btn instanceof HTMLElement ? btn : null)?.click();
         }, sid);
-        await page.waitForTimeout(250);
+        await page.waitForTimeout(300);
         await page.screenshot({
           path: `${outDir}/${sid}-${vp.width}.png`,
           fullPage: false,

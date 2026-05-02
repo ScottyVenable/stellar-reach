@@ -14,6 +14,7 @@ import { TabBar } from './components/TabBar';
 import { RightRail } from './components/RightRail';
 import { SettingsModal } from './components/SettingsModal';
 import { Breadcrumb } from './components/Breadcrumb';
+import { MobileSheet } from './components/MobileSheet';
 
 type IconName = 'market' | 'ship' | 'crew' | 'helm' | 'news' | 'jobs' | 'log';
 
@@ -117,6 +118,7 @@ export function App() {
         </div>
       </main>
       <RightRail />
+      <MobileSheet />
       {trip && <TripModal />}
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
     </div>
