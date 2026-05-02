@@ -28,7 +28,7 @@ Categories (omit a category if it has no entries):
 -->
 
 ### Features
-- UI rehaul: bridge-console identity. Self-hosted typography pairing
+- UI overhaul: bridge-console identity. Self-hosted typography pairing
   (Chakra Petch for HUD chrome and headings, Space Grotesk for body
   copy, JetBrains Mono for numerics and labels). Desktop adopts a full
   HUD strip across the top with stardate, callsign, hull / fuel / cargo
@@ -53,14 +53,14 @@ Categories (omit a category if it has no entries):
   and the PWA manifest no longer locks orientation to portrait. (#89)
 
 ### Improvements
-- UI rehaul pass 3: Helm now uses a desktop 3:1 map/destination layout
+- UI overhaul pass 3: Helm now uses a desktop 3:1 map/destination layout
   with matching panel heights and an overlay destination plot panel, while
   mobile keeps the datapad stack but opens destination details as a sheet.
   Market rows now include quantity steppers with hold-to-repeat acceleration
   alongside the number input, plus compact cargo / fuel context to reduce
   screen-hopping during trade. HUD credits and vessel meters have more
   vertical room to prevent clipped numerics and bars. (#100)
-- UI rehaul pass 2: AAA polish push. Panels and HUD cells gain layered
+- UI overhaul pass 2: AAA polish push. Panels and HUD cells gain layered
   surfaces with inset bezel highlights, outer drop shadows, and clip-path
   bevel cuts at the top-right and bottom-left corners. Buttons now have
   real press feedback (inset shadow + reversed gradient on `:active`).

@@ -64,6 +64,7 @@ export function MobileSheet() {
           id="mobile-status-sheet"
           className="mobile-sheet-backdrop"
           role="dialog"
+          aria-modal="true"
           aria-label="Vessel status"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);

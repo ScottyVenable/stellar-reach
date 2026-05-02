@@ -14,7 +14,7 @@ function formatCreditsCompact(value: number): string {
   // the value exceeds 999,999 we fall back to a "K"/"M" suffix.
   const v = Math.max(0, Math.floor(value));
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
-  if (v >= 100_000) return `${(v / 1000).toFixed(0)}K`;
+  if (v >= 100_000) return `${Math.floor(v / 1000)}K`;
   return String(v).padStart(6, '0').replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 

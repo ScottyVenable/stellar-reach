@@ -52,12 +52,11 @@ export function SettingsModal({ onClose }: Props) {
           <div className="settings-row">
             <span className="settings-label">Font scale</span>
             <span className="settings-help">Adjust readability without zooming the whole page.</span>
-            <div className="settings-segments" role="radiogroup" aria-label="Font scale">
+            <div className="settings-segments" role="group" aria-label="Font scale">
               {FONT_SCALE_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
-                  role="radio"
-                  aria-checked={settings.fontScale === opt.value}
+                  aria-pressed={settings.fontScale === opt.value}
                   className={settings.fontScale === opt.value ? 'active' : ''}
                   onClick={() => setSetting('fontScale', opt.value)}
                 >
@@ -70,12 +69,11 @@ export function SettingsModal({ onClose }: Props) {
           <div className="settings-row">
             <span className="settings-label">Density</span>
             <span className="settings-help">Tighten or relax the space between rows.</span>
-            <div className="settings-segments" role="radiogroup" aria-label="Density">
+            <div className="settings-segments" role="group" aria-label="Density">
               {DENSITY_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
-                  role="radio"
-                  aria-checked={settings.density === opt.value}
+                  aria-pressed={settings.density === opt.value}
                   className={settings.density === opt.value ? 'active' : ''}
                   onClick={() => setSetting('density', opt.value)}
                 >
@@ -90,12 +88,11 @@ export function SettingsModal({ onClose }: Props) {
             <span className="settings-help">
               System matches your OS preference. Reduce disables HUD flickers and screen fades.
             </span>
-            <div className="settings-segments" role="radiogroup" aria-label="Motion">
+            <div className="settings-segments" role="group" aria-label="Motion">
               {MOTION_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
-                  role="radio"
-                  aria-checked={settings.motion === opt.value}
+                  aria-pressed={settings.motion === opt.value}
                   className={settings.motion === opt.value ? 'active' : ''}
                   onClick={() => setSetting('motion', opt.value)}
                 >

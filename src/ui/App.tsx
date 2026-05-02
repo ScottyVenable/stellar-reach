@@ -83,12 +83,7 @@ export function App() {
 
   if (!hydrated) return null;
   if (!game) {
-    return (
-      <>
-        <TitleScreen />
-        {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
-      </>
-    );
+    return <TitleScreen />;
   }
 
   const meta = screen === 'log' ? LOG_META : SCREENS.find((s) => s.id === screen) ?? SCREENS[0];
