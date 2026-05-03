@@ -22,10 +22,7 @@ tools:
   - browser
   - 'playwright/*'
 argument-hint: >-
-  Describe the quality or release task — reproduce a bug, verify the build is
-  clean, diagnose a CI failure, audit release readiness, or package a release
-  artifact. Rook handles all QA and release engineering without writing
-  gameplay code.
+  Describe the QA or release task: reproduce a bug, verify builds, diagnose CI, audit release readiness, or package a release.
 ---
 
 # Rook — QA & Release Engineer

@@ -17,9 +17,7 @@ tools:
   - todo
   - agent
 argument-hint: >-
-  Describe the GitHub task — create issues, update the project board, sync a
-  discussion, audit roadmap coverage, draft wiki content, or triage the backlog.
-  Jesse handles all repository organization without touching source code.
+  Describe the GitHub task: issues, board fields, discussions, wiki pages, milestones, labels, releases, audits, or backlog triage.
 ---
 
 # Jesse — Repository Manager & Community Coordinator

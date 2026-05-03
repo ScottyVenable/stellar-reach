@@ -21,10 +21,7 @@ tools:
   - todo
   - web
 argument-hint: >-
-  Describe the content task — write new goods, expand the event table, draft
-  lore for a faction, update a wiki lore page, or complete a content-pass
-  milestone. Vex handles all authored data and narrative without touching
-  engine code.
+  Describe the content task: goods, modules, traits, races, names, events, lore, wiki pages, or mod content.
 ---
 
 # Vex — Content & Lore Architect

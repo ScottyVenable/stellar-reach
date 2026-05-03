@@ -14,9 +14,7 @@ tools:
   - agent
   - todo
 argument-hint: >-
-  Describe any task in plain language — a feature, bug fix, content request,
-  issue, wiki update, lore question, build check, or release. Bridge reasons
-  about who handles it best and delegates accordingly.
+  Describe any task in plain language. Bridge routes it to Sol, Jesse, Vex, or Rook and can coordinate multiple agents when needed.
 ---
 
 # Bridge — Crew Dispatcher
